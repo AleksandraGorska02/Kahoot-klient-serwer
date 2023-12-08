@@ -26,7 +26,22 @@ int main() {
 
     std::cout << "Połączono z serwerem\n";
 
-    // Tutaj możesz dodać kod do wysyłania i odbierania danych od serwera
+    // Odczytaj dane od serwera
+    char buffer[1024];
+    int bytesRead = recv(clientSocket, buffer, sizeof(buffer), 0);
+    if (bytesRead > 0) {
+        std::cout << "Otrzymano dane od serwera: " << std::string(buffer, bytesRead) << std::endl;
+
+        // Wprowadź odpowiedź z klawiatury
+        std::cout << "Wprowadź odpowiedź: ";
+        std::string response;
+        std::getline(std::cin, response);
+
+        // Wyślij odpowiedź do serwera
+        send(clientSocket, response.c_str(), response.size(), 0);
+    } else {
+        std::cerr << "Błąd przy odbieraniu danych od serwera\n";
+    }
 
     // Zamknij gniazdo klienta
     close(clientSocket);

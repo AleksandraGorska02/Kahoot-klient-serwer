@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <cstring>
 #include <arpa/inet.h>
 #include <unistd.h>
@@ -45,11 +46,40 @@ int main() {
 
     std::cout << "Połączenie zaakceptowane\n";
 
-    // Tutaj możesz dodać kod obsługujący komunikację z klientem
+    // Odczytaj pierwszą linię z pliku tekstowego
+    std::ifstream file("example.txt");
+    std::string firstLine;
+    if (std::getline(file, firstLine)) {
+        // Wyślij pierwszą linię do klienta
+        send(clientSocket, firstLine.c_str(), firstLine.size(), 0);
+        std::cout << "Wysłano pierwszą linię do klienta: " << firstLine << std::endl;
+    } else {
+        std::cerr << "Błąd przy odczycie pliku\n";
+    }
+    
+    std::string secondLine;
+    if (std::getline(file, secondLine)) {
+        std::cout << "Odczytano drugą linię z pliku: " << secondLine << std::endl;
+
+        // Poczekaj na odpowiedź od klienta
+        char clientResponse[1024];
+        recv(clientSocket, clientResponse, sizeof(clientResponse), 0);
+
+        // Sprawdź odpowiedź
+        if (secondLine == clientResponse) {
+            std::cout << "Odpowiedź klienta jest poprawna!\n";
+        } else {
+            std::cout << "Odpowiedź klienta jest niepoprawna.\n";
+        }
+    } else {
+        std::cerr << "Błąd przy odczycie pliku\n";
+    }
 
     // Zamknij gniazdo serwera i klienta
     close(serverSocket);
     close(clientSocket);
+
+    return 0;
 
     return 0;
 }
