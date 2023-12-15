@@ -17,7 +17,7 @@ int main()
     // Skonfiguruj strukturę adresową serwera
     sockaddr_in serverAddress;
     serverAddress.sin_family = AF_INET;
-    serverAddress.sin_port = htons(10016); // Możesz zmienić port
+    serverAddress.sin_port = htons(12345); // Możesz zmienić port
     serverAddress.sin_addr.s_addr = INADDR_ANY;
 
     // Zwiąż gniazdo z adresem
@@ -83,6 +83,15 @@ int main()
 
             std::cout << "Otrzymano odpowiedź od klienta: " << clientResponse[0] << std::endl;
 
+            // Sprawdź odpowiedź
+            if (secondLine[0] == clientResponse[0])
+            {
+                std::cout << "Odpowiedź klienta jest poprawna!\n";
+            }
+            else
+            {
+                std::cout << "Odpowiedź klienta jest niepoprawna.\n";
+            }
             // Sprawdź odpowiedź
             if (secondLine[0] == clientResponse[0])
             {
