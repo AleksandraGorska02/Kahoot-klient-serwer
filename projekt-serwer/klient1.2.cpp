@@ -14,7 +14,7 @@ int main() {
     // Skonfiguruj strukturę adresową serwera
     sockaddr_in serverAddress;
     serverAddress.sin_family = AF_INET;
-    serverAddress.sin_port = htons(12345); // Użyj tego samego portu co serwer
+    serverAddress.sin_port = htons(12347); // Użyj tego samego portu co serwer
     inet_pton(AF_INET, "127.0.0.1", &(serverAddress.sin_addr));
 
     // Połącz się z serwerem
