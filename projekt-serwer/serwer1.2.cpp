@@ -71,7 +71,8 @@ int main()
         {
             std::cout << "Odczytano drugą linię z pliku: " << secondLine << std::endl;
 
-            // Poczekaj na odpowiedź od klienta
+            // Poczekaj na odpowie
+            //dź od klienta
             char clientResponse[1024];
             recv(clientSocket, clientResponse, sizeof(clientResponse), 0);
             int recvSize = strlen(clientResponse);
