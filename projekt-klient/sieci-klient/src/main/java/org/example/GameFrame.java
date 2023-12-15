@@ -11,8 +11,11 @@ public class GameFrame extends JFrame{
     JButton d=new JButton("d");//d
     JButton ok=new JButton("ok");//ok
   JLabel questionLabel;
+  JLabel okLabel;
   JPanel questionPanel;
+
   JPanel o;
+  JPanel answerPanel;
 
 
 
@@ -38,8 +41,17 @@ public class GameFrame extends JFrame{
     }
     public void makeOkPanel(){
         o = new JPanel();
+        okLabel = new JLabel("czy jesteś gotowy?");
+
+        o.add(okLabel);
         o.add(ok);
 
     }
+    public void makeAnswerPanel(String answer){
+        answerPanel = new JPanel();
+        JLabel answerLabel = new JLabel(answer);
+        answerPanel.add(answerLabel);
+    }
+
 
 }
