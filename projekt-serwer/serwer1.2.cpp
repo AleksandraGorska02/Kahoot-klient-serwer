@@ -17,7 +17,7 @@ int main()
     // Skonfiguruj strukturę adresową serwera
     sockaddr_in serverAddress;
     serverAddress.sin_family = AF_INET;
-    serverAddress.sin_port = htons(12345); // Możesz zmienić port
+    serverAddress.sin_port = htons(12348); // Możesz zmienić port
     serverAddress.sin_addr.s_addr = INADDR_ANY;
 
     // Zwiąż gniazdo z adresem
@@ -53,8 +53,11 @@ int main()
         std::cout << "Połączenie zaakceptowane\n";
 
         // Odczytaj pierwszą linię z pliku tekstowego
-      
-        std::ifstream file("example.txt");
+         char clientResponse1[1024];
+            recv(clientSocket, clientResponse1, sizeof(clientResponse1), 0);
+           if(clientResponse1[0] =='o'){
+
+ std::ifstream file("example.txt");
         std::string firstLine;
         
         if (std::getline(file, firstLine))
@@ -87,26 +90,29 @@ int main()
             if (secondLine[0] == clientResponse[0])
             {
                 std::cout << "Odpowiedź klienta jest poprawna!\n";
+                std::string poprawna = "Odpowiedź klienta jest poprawna!\n";
+                send(clientSocket, poprawna.c_str(), poprawna.size(), 0);
             }
             else
             {
                 std::cout << "Odpowiedź klienta jest niepoprawna.\n";
+               
+
+                std::string niepoprawna = "Odpowiedź klienta jest niepoprawna.\n";
+                send(clientSocket, niepoprawna.c_str(), niepoprawna.size(), 0);
             }
             // Sprawdź odpowiedź
-            if (secondLine[0] == clientResponse[0])
-            {
-                std::cout << "Odpowiedź klienta jest poprawna!\n";
-            }
-            else
-            {
-                std::cout << "Odpowiedź klienta jest niepoprawna.\n";
-            }
+          
         }
         else
         {
             std::cerr << "Błąd przy odczycie pliku\n";
         }
         close(clientSocket);
+           }
+
+      
+       
     }
 
     // Zamknij gniazdo serwera i klienta
