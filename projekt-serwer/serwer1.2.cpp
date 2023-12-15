@@ -17,7 +17,7 @@ int main()
     // Skonfiguruj strukturę adresową serwera
     sockaddr_in serverAddress;
     serverAddress.sin_family = AF_INET;
-    serverAddress.sin_port = htons(10013); // Możesz zmienić port
+    serverAddress.sin_port = htons(10016); // Możesz zmienić port
     serverAddress.sin_addr.s_addr = INADDR_ANY;
 
     // Zwiąż gniazdo z adresem
@@ -53,10 +53,14 @@ int main()
         std::cout << "Połączenie zaakceptowane\n";
 
         // Odczytaj pierwszą linię z pliku tekstowego
+      
         std::ifstream file("example.txt");
         std::string firstLine;
+        
         if (std::getline(file, firstLine))
         {
+            
+            sleep(10);
             // Wyślij pierwszą linię do klienta
             send(clientSocket, firstLine.c_str(), firstLine.size(), 0);
             std::cout << "Wysłano pierwszą linię do klienta: " << firstLine << std::endl;
@@ -75,7 +79,7 @@ int main()
             //dź od klienta
             char clientResponse[1024];
             recv(clientSocket, clientResponse, sizeof(clientResponse), 0);
-            int recvSize = strlen(clientResponse);
+            
 
             std::cout << "Otrzymano odpowiedź od klienta: " << clientResponse[0] << std::endl;
 
