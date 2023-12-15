@@ -15,64 +15,80 @@ public class Main {
         Socket clientSocket = new Socket();
 
 
-        InetSocketAddress serverAddress = new InetSocketAddress(InetAddress.getByName("127.0.0.1"), 10013);
+        InetSocketAddress serverAddress = new InetSocketAddress(InetAddress.getByName("127.0.0.1"), 10016 );
 
         GameFrame gameFrame = new GameFrame(500, 500);
-        try {
-            clientSocket = new Socket();
+
+        connect(clientSocket, serverAddress, gameFrame);
+
+        ok(gameFrame);
+        question(clientSocket,  gameFrame);
+
+
+
+
+
+
+
+    }
+    static void threadsMessage(Socket clientSocket, GameFrame gameFrame){
+      Thread getMessage=  new Thread(()->{
+            while(true){
+                byte[] buffer = new byte[1024];
+                int bytesRead = 0;
+                try {
+                    bytesRead = clientSocket.getInputStream().read(buffer);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                if (bytesRead > 0) {
+                    String message = new String(buffer, 0, bytesRead);
+                    System.out.println("Otrzymano dane od serwera watek: " + message);
+                    messageFromServer(message,gameFrame);
+
+            }}
+        });
+        getMessage.start();
+    }
+    static void connect(Socket clientSocket, InetSocketAddress serverAddress,GameFrame gameFrame) throws IOException {
+       SwingUtilities.invokeLater(()->{
+
+        while(true){
+        try {gameFrame.setVisible(true);
+            gameFrame.makeOkPanel();
+            gameFrame.setContentPane(gameFrame.o);
+            gameFrame.validate();
+
             clientSocket.connect(new InetSocketAddress(serverAddress.getAddress(), serverAddress.getPort()));
             System.out.println("Połączono z serwerem 1");
+            threadsMessage(clientSocket,gameFrame);
+               break;
+
         } catch (IOException e) {
             System.err.println("Błąd przy połączeniu z serwerem");
-            clientSocket.close();
+            try {
+                clientSocket.close();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+            break;
 
-        }
-
-        PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-       ok(gameFrame);
-        question(clientSocket, out, gameFrame);
-
-
-
-
-        clientSocket.close();
-        System.out.println("Zamknięto połączenie z serwerem");
-
-
+        }}  });
     }
-
-    static void ok(GameFrame gameFrame){
-        gameFrame.setVisible(true);
-        gameFrame.makeOkPanel();
-        gameFrame.setContentPane(gameFrame.o);
-
-        CountDownLatch latch = new CountDownLatch(1);
-        gameFrame.ok.addActionListener(e -> {
-            //poczekaj na nacisniecie i potem przejdz dalej
-
-            latch.countDown();
-        });
-        try {
-            latch.await();
-            System.out.println("przechodzimy do pytania");
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+    static void messageFromServer(String message, GameFrame gameFrame){
+        if(message.equals("ok")){
+            gameFrame.setVisible(true);
+            gameFrame.makeOkPanel();
+            gameFrame.setContentPane(gameFrame.o);
+            gameFrame.validate();
         }
-
-    }
-
-    static void question(Socket clientSocket, PrintWriter out, GameFrame gameFrame) throws IOException {
-
-        byte[] buffer = new byte[1024];
-        int bytesRead = clientSocket.getInputStream().read(buffer);
-        if (bytesRead > 0) {
-            String question = new String(buffer, 0, bytesRead);
-gameFrame.setVisible(true);
-            gameFrame.makeQuestionPanel(question);
-
+        if (message.startsWith("P")){
+            gameFrame.setVisible(true);
+            gameFrame.makeQuestionPanel(message);
             gameFrame.setContentPane(gameFrame.questionPanel);
             gameFrame.validate();
-            System.out.println("Otrzymano dane od serwera: " + question);
+            System.out.println("Otrzymano dane od serwera: przechwycenie wiadomosci " + message);
+
 
             gameFrame.a.setBounds(100,100,100, 40);
             gameFrame.b.setBounds(300,100,100, 40);
@@ -80,47 +96,51 @@ gameFrame.setVisible(true);
             gameFrame.d.setBounds(300,200,100, 40);
 
 
+        }
 
-                CountDownLatch latch = new CountDownLatch(1);
+    }
+
+    static void ok(GameFrame gameFrame){
+
+        gameFrame.ok.addActionListener(e -> {
+           System.out.println("do pytania");
+
+
+        });
+
+    }
+
+    static void question(Socket clientSocket, GameFrame gameFrame) throws IOException {
+
 
                 gameFrame.a.addActionListener(e -> {
                     String Resp = gameFrame.a.getText();
                     out.println(Resp);
                     System.out.println("Wysłano odpowiedź do serwera: " + Resp);
-                    latch.countDown(); // Signal that the button has been pressed
-                });
+               });
 
                 gameFrame.b.addActionListener(e -> {
                     String Resp = gameFrame.b.getText();
                     out.println(Resp);
                     System.out.println("Wysłano odpowiedź do serwera: " + Resp);
-                    latch.countDown(); // Signal that the button has been pressed
                 });
 
                 gameFrame.c.addActionListener(e -> {
                     String Resp = gameFrame.c.getText();
                     out.println(Resp);
                     System.out.println("Wysłano odpowiedź do serwera: " + Resp);
-                    latch.countDown(); // Signal that the button has been pressed
-                });
+               });
 
                 gameFrame.d.addActionListener(e -> {
                     String Resp = gameFrame.d.getText();
                     out.println(Resp);
                     System.out.println("Wysłano odpowiedź do serwera: " + Resp);
-                    latch.countDown(); // Signal that the button has been pressed
                 });
 
-                try {
-                    latch.await();
-                    System.out.println("Oczekuję na odpowiedź od serwera");
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
+
 
 
 
         }
 
     }
-}
