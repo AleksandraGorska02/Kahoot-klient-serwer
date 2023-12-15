@@ -15,14 +15,13 @@ public class Main {
         Socket clientSocket = new Socket();
 
 
-        InetSocketAddress serverAddress = new InetSocketAddress(InetAddress.getByName("127.0.0.1"), 10016 );
+        InetSocketAddress serverAddress = new InetSocketAddress(InetAddress.getByName("127.0.0.1"), 12348 );
 
         GameFrame gameFrame = new GameFrame(500, 500);
 
         connect(clientSocket, serverAddress, gameFrame);
 
-        ok(gameFrame);
-        question(clientSocket,  gameFrame);
+
 
 
 
@@ -37,31 +36,40 @@ public class Main {
                 byte[] buffer = new byte[1024];
                 int bytesRead = 0;
                 try {
+                    // Read bytes from socket
                     bytesRead = clientSocket.getInputStream().read(buffer);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
                 if (bytesRead > 0) {
+                    // Convert bytes to string
                     String message = new String(buffer, 0, bytesRead);
                     System.out.println("Otrzymano dane od serwera watek: " + message);
                     messageFromServer(message,gameFrame);
+
 
             }}
         });
         getMessage.start();
     }
-    static void connect(Socket clientSocket, InetSocketAddress serverAddress,GameFrame gameFrame) throws IOException {
+   public static void connect(Socket clientSocket, InetSocketAddress serverAddress,GameFrame gameFrame) throws IOException {
        SwingUtilities.invokeLater(()->{
 
         while(true){
-        try {gameFrame.setVisible(true);
+        try {
+            //tworzymy okno
+            gameFrame.setVisible(true);
             gameFrame.makeOkPanel();
             gameFrame.setContentPane(gameFrame.o);
             gameFrame.validate();
-
+//łączymy się z serwerem
             clientSocket.connect(new InetSocketAddress(serverAddress.getAddress(), serverAddress.getPort()));
             System.out.println("Połączono z serwerem 1");
             threadsMessage(clientSocket,gameFrame);
+            PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+//dodajemy akcje dla przycisków
+            question(clientSocket, out, gameFrame);
+            ok(gameFrame, out);
                break;
 
         } catch (IOException e) {
@@ -97,20 +105,31 @@ public class Main {
 
 
         }
+        if (message.startsWith("O")){
+            gameFrame.setVisible(true);
+            gameFrame.makeAnswerPanel(message);
+            gameFrame.setContentPane(gameFrame.answerPanel);
+            gameFrame.validate();
+            System.out.println("Otrzymano dane od serwera: przechwycenie wiadomosci " + message);
+        }
 
     }
 
-    static void ok(GameFrame gameFrame){
+    static void ok(GameFrame gameFrame, PrintWriter out){
 
         gameFrame.ok.addActionListener(e -> {
            System.out.println("do pytania");
+            out.println("ok");
+            System.out.println("Wysłano odpowiedź do serwera: ok");
+            gameFrame.ok.setEnabled(false);
+            gameFrame.okLabel.setText("czekaj na pytanie");
 
 
         });
 
     }
 
-    static void question(Socket clientSocket, GameFrame gameFrame) throws IOException {
+    static void question(Socket clientSocket,PrintWriter out, GameFrame gameFrame) throws IOException {
 
 
                 gameFrame.a.addActionListener(e -> {
