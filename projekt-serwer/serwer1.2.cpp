@@ -37,8 +37,11 @@ public:
 
 public:
     std::chrono::time_point<std::chrono::high_resolution_clock> clientTimeEnd;
+
 public:
-bool gameMaster;
+    bool gameMaster;
+public:
+    int gameCode;
 
 public:
     Client()
@@ -49,13 +52,14 @@ public:
         clientLogin = "";
         clientAnswer = "";
         gameMaster = false;
+        gameCode = 0;
     };
 };
 std::string secondLine;
 std::chrono::steady_clock::time_point alarmEndTime;
 std::vector<Client> connectedClients; // Store connected clients
 std::set<int> clientsReady;
-std::string gameQuestion="";
+std::string gameQuestion = "";
 // lista loginów
 std::vector<std::string> logins;
 void endThisGame()
@@ -201,7 +205,7 @@ int main()
         SIGALRM, (__sighandler_t)[](int sig) {
             std::cout << "Czas minął\n";
             endThisGame();
-            alarm(10);
+
         });
 
     while (true)
@@ -232,10 +236,7 @@ int main()
             // Add the new client's socket to epoll
             epollEvent.events = EPOLLIN;
             epollEvent.data.fd = clientSocket;
-            //wyslij "C" do klienta
-            std::string C = "C";
-            send(clientSocket, C.c_str(), C.size(), 0);
-
+         
             if (epoll_ctl(epollFd, EPOLL_CTL_ADD, clientSocket, &epollEvent) == -1)
             {
                 std::cerr << "Błąd przy dodawaniu klienta do epoll\n";
@@ -244,57 +245,72 @@ int main()
         }
         else if (epollEvent.events & EPOLLIN && epollEvent.data.fd != serverSocket)
         {
+
             // Handle data from the client
             int clientSocket = epollEvent.data.fd;
-           //czytaj wiadomosc od klienta tylko do znaku nowej lini wiec nie dawaj na sztywno 1024 jako rozmiar wiadomosci
-           
-const int bufferSize = 1; // Read one character at a time
-char buffer[bufferSize];
+            // czytaj wiadomosc od klienta tylko do znaku nowej lini wiec nie dawaj na sztywno 1024 jako rozmiar wiadomosci
 
-std::string clientResponse1;
-ssize_t bytesRead = 0;
+            const int bufferSize = 1; // Read osne character at a time
+            char buffer[bufferSize];
 
-while (true)
-{
-    bytesRead = recv(clientSocket, buffer, bufferSize, 0);
+            std::string clientResponse1;
+            ssize_t bytesRead = 0;
 
-    if (bytesRead == -1)
-    {
-        if (errno == EAGAIN || errno == EWOULDBLOCK)
-        {
-            // No more data to read
-            break;
-        }
-        else
-        {
-            // Handle error
-            std::cerr << "Error reading from client" << std::endl;
-            break;
-        }
-    }
-    else if (bytesRead == 0)
-    {
-        // Connection closed by the client
-        std::cout << "Client " << clientSocket << " disconnected" << std::endl;
-        // Handle disconnection as needed
-        break;
-    }
-    else
-    {
-        // Append the read character to the message
-        clientResponse1 += buffer[0];
+            while (true)
+            {
+                bytesRead = recv(clientSocket, buffer, bufferSize, 0);
 
-        // Check if the newline character is received
-        if (buffer[0] == '\n')
-        {
-            // Process the complete message
-            break;
-        }
-    }
-}
+                if (bytesRead == -1)
+                {
+                    if (errno == EAGAIN || errno == EWOULDBLOCK)
+                    {
+                        // No more data to read
+                        break;
+                    }
+                    else
+                    {
+                        // Handle error
+                        std::cerr << "Error reading from client" << std::endl;
+                        break;
+                    }
+                }
+                else if (bytesRead == 0)
+                {
+                    // Connection closed by the client
+                    std::cout << "Client " << clientSocket << " disconnected" << std::endl;
+                 //przestan odbierac wiadomosci od tego klienta
+                    epoll_ctl(epollFd, EPOLL_CTL_DEL, clientSocket, &epollEvent);
+                    // zamknij gniazdo klienta
+                    close(clientSocket);
+                    // usun klienta z listy
+                    for (int i = 0; i < connectedClients.size(); ++i)
+                    {
+                        if (connectedClients[i].clientSocket == clientSocket)
+                        {
+                            connectedClients.erase(connectedClients.begin() + i);
+                            break;
+                        }
+                    }
+                 
+
+                    break;
+                }
+                else
+                {
+                    // Append the read character to the message
+                    clientResponse1 += buffer[0];
+
+                    // Check if the newline character is received
+                    if (buffer[0] == '\n')
+                    {
+                        // Process the complete message
+                        break;
+                    }
+                }
+            }
 
             std::cout << "Otrzymano wiadomość od klienta: " << clientResponse1 << std::endl;
-         if (clientResponse1[0] == 'o')
+            if (clientResponse1[0] == 'o')
             {
                 // Add the client to the set of ready clients
                 clientsReady.insert(clientSocket);
@@ -350,21 +366,44 @@ while (true)
                     send(clientSocket, loginNO.c_str(), loginNO.size(), 0);
                 }
             }
-            else if(clientResponse1[0]=='P'){
+            else if (clientResponse1[0] == 'P')
+            {
 
                 std::string question = clientResponse1;
-std::cout << "pytanie: " << question << std::endl;
-                //wymaż wszytko co jest po znaku nowej linii
-                //wyswieetl pytanie
-                
+                std::cout << "pytanie: " << question << std::endl;
+                // wymaż wszytko co jest po znaku nowej linii
+                // wyswieetl pytanie
+
                 char answer = question[question.size() - 2];
-              //wymaz znak nowej lini i ostatnia litere pytrania
+                // wymaz znak nowej lini i ostatnia litere pytrania
                 question.erase(question.size() - 2, 2);
 
-             
-                std::cout << "pytanie: " << question <<" odpowiedz: "<<answer<<std::endl;
-              //zapisz pytanie na koncu pliku tekstowego jak nie istnieje to go stworz
-                std::ofstream file("example4.txt", std::ios_base::app);
+                std::cout << "pytanie: " << question << " odpowiedz: " << answer << std::endl;
+                //sprawdz czy klient ma przypisany kod gry jezeli nie to przypisz mu
+                int gameCode;
+                for (int i = 0; i < connectedClients.size(); ++i)
+                {
+                    if (connectedClients[i].clientSocket == clientSocket)
+                    {
+                        if (connectedClients[i].gameCode == 0)
+                        {
+                            //kod to 4 losowe cyfry
+                            srand(time(NULL));
+                            gameCode = rand() % 9000 + 1000;
+                            connectedClients[i].gameCode = gameCode;
+
+                        }
+                        break;
+                    }
+                }
+                std::string gameCodeString = std::to_string(gameCode);
+                std::string filename = std::to_string(gameCode) + ".txt";
+
+
+                
+                // zapisz pytanie na koncu pliku tekstowego jak nie istnieje to go stworz
+                
+                std::ofstream file(filename, std::ios_base::app);
                 if (file.is_open())
                 {
                     file << question << std::endl;
@@ -375,7 +414,30 @@ std::cout << "pytanie: " << question << std::endl;
                 {
                     std::cout << "Unable to open file";
                 }
-               
+            }
+            //nadanie roli gamemastera klientowi
+            else if (clientResponse1[0] == 'G')
+            {
+                std::cout << "klient " << clientSocket << " jest gamemasterem" << std::endl;
+                for (int i = 0; i < connectedClients.size(); ++i)
+                {
+                    if (connectedClients[i].clientSocket == clientSocket)
+                    {
+                        connectedClients[i].gameMaster = true;
+                        break;
+                    }
+                }
+                //przejscie do tworzenia gry i wyslanie c do klienta
+                std::string C = "C";
+                send(clientSocket, C.c_str(), C.size(), 0);
+            }
+            //wyslij klientowi dostep do ekranu logowania
+            else if (clientResponse1[0] == 'g')
+            {
+                std::string L = "L";
+                send(clientSocket, L.c_str(), L.size(), 0);
+                //wyslij klientowi dostep do ekranu logowania
+                std::cout << "wyslano L do klienta" << std::endl;
             }
         }
     }
