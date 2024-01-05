@@ -62,7 +62,53 @@ std::set<int> clientsReady;
 std::string gameQuestion = "";
 // lista loginów
 std::vector<std::string> logins;
-void endThisGame()
+void startGame()
+{
+    std::cout << "Runda rozpoczęta\n";
+
+   
+    static std::ifstream file("example.txt"); // Otwórz plik
+    static std::streampos lastPosition = 0;    // Ustaw pozycję na początku pliku
+
+    std::string firstLine;
+
+    // Move to the last position in the file
+    file.seekg(lastPosition);
+
+    // Read the first line
+    if (std::getline(file, firstLine))
+    {
+        // Send the first line to all clients
+        for (int i = 0; i < connectedClients.size(); ++i)
+        {
+            send(connectedClients[i].clientSocket, firstLine.c_str(), firstLine.size(), 0);
+            std::cout << "Wysłano pierwszą linię do klienta: " << firstLine << std::endl;
+            connectedClients[i].clientTimeStart = std::chrono::high_resolution_clock::now();
+        }
+
+        // Read the second line
+        if (std::getline(file, secondLine))
+        {
+            std::cout << "Odczytano drugą linię z pliku: " << secondLine << std::endl;
+        }
+        else
+        {
+            std::cerr << "koniec pliku\n";
+        }
+
+        // Store the current position for the next call
+        lastPosition = file.tellg();
+
+        // Set an alarm for 10 seconds
+        alarm(10);
+    }
+    else
+    {
+        std::cerr << "koniec pliku\n";
+    }
+}
+
+void endRound()
 {
     for (int i = 0; i < connectedClients.size(); ++i)
     {
@@ -91,36 +137,11 @@ void endThisGame()
             send(connectedClients[i].clientSocket, niepoprawna.c_str(), niepoprawna.size(), 0);
         }
     }
+    std::cout << "Koniec rundy\n";
+    startGame();
 }
 
-void startGame(std::vector<Client> &connectedClients, std::string &secondLine)
-{
-    std::cout << "Gra rozpoczęta\n";
 
-    std::cout << "All clients are ready\n";
-
-    std::ifstream file("example.txt");
-    std::string firstLine;
-    if (std::getline(file, firstLine))
-    {
-        // Send the first line to all clients
-        for (int i = 0; i < connectedClients.size(); ++i)
-        {
-            send(connectedClients[i].clientSocket, firstLine.c_str(), firstLine.size(), 0);
-            std::cout << "Wysłano pierwszą linię do klienta: " << firstLine << std::endl;
-            connectedClients[i].clientTimeStart = std::chrono::high_resolution_clock::now();
-        }
-        if (std::getline(file, secondLine))
-        {
-            std::cout << "Odczytano drugą linię z pliku: " << secondLine << std::endl;
-        }
-        else
-        {
-            std::cerr << "Błąd przy odczycie pliku\n";
-        }
-        alarm(10);
-    }
-}
 
 void givePoint(std::vector<Client> &connectedClients)
 {
@@ -204,7 +225,7 @@ int main()
     signal(
         SIGALRM, (__sighandler_t)[](int sig) {
             std::cout << "Czas minął\n";
-            endThisGame();
+            endRound();
 
         });
 
@@ -319,7 +340,7 @@ int main()
                 {
                     std::cout << "All clients are ready\n";
                     // All clients are ready, start the game
-                    startGame(connectedClients, secondLine);
+                    startGame();
                 }
             }
             else if (clientResponse1[0] == 'n')
