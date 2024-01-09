@@ -52,11 +52,14 @@ public:
     int gameMasterQuestionCounter;
 
 public:
+    int clientPoints;
+
+public:
     Client()
     {
         clientSocket = 0;
 
-        clientScore = 0;
+        clientPoints = 0;
 
         clientAnswer = "";
 
@@ -150,7 +153,7 @@ public:
         file.close();
         (void)std::async(std::launch::async, [this]()
                          {
-        std::this_thread::sleep_for(std::chrono::seconds(5));
+        std::this_thread::sleep_for(std::chrono::seconds(10));
         endRound(); });
     };
 
@@ -196,30 +199,74 @@ public:
             }
         }
         std::cout << "Koniec rundy\n";
-        std::this_thread::sleep_for(std::chrono::seconds(10));
+        std::this_thread::sleep_for(std::chrono::seconds(5));
         startGame();
     };
     void buildRanking()
     {
-        // wyswietl czas i loginy klientow
-        std::cout << "Ranking:\n";
-        std::vector<std::pair<std::string, double>> ranking;
+        std::cout << "Budowanie rankingu\n";
+        // Sort the clients by their time
+        std::vector<Client> sortedClients;
         for (const auto &entry : this->connectedClients)
         {
-            const auto &client = entry.second;
-            std::cout << "Czas klienta: " << client.clientTime << " seconds" << std::endl;
-            std::cout << "Login klienta: " << client.clientLogin << std::endl;
-            ranking.push_back(std::make_pair(client.clientLogin, client.clientTime));
+            sortedClients.push_back(entry.second);
         }
-        // sortowanie rankingu
-        std::sort(ranking.begin(), ranking.end(), [](const std::pair<std::string, double> &left, const std::pair<std::string, double> &right)
-                  { return left.second < right.second; });
-        // wyswietl ranking
-        for (int i = 0; i < static_cast<int>(ranking.size()); i++)
+        std::sort(sortedClients.begin(), sortedClients.end(), [](const Client &a, const Client &b)
+                  { return a.clientTime < b.clientTime; });
+        //dla posortowanego wektora zmnien punkty na 0
+        for (int i = 0; i < static_cast<int>(sortedClients.size()); ++i)
         {
-            std::cout << "Miejsce " << i + 1 << ": " << ranking[i].first << " " << ranking[i].second << std::endl;
+            sortedClients[i].clientPoints = 0;
         }
+
+        // teraz sprawdz czy odpowiedzi są poprawne jezeli tak to daj pierwszemu 3 punkty 2 drugiemu, a pozostałym z poprawnymi daj 1 punkt
+        for (int i = 0; i < static_cast<int>(sortedClients.size()); ++i)
+        {
+            if (sortedClients[i].clientAnswer[0] == secondLine[0])
+            {
+                std::cout<<"dodano punkty"<<sortedClients[i].clientLogin<<"odp"<<sortedClients[i].clientAnswer[0]<<std::endl;
+                std::cout<<"poprawna odp"<<secondLine[0]<<std::endl;
+                sortedClients[i].clientPoints = +1;
+            }
+        }
+        int counter = 0;
+        for (int i = 0; i < static_cast<int>(sortedClients.size()); ++i)
+        {
+            if (sortedClients[i].clientAnswer[0] == secondLine[0])
+            {
+
+                counter++;
+                if (counter == 1)
+                {
+                    sortedClients[i].clientPoints = 3;
+                    continue;
+                }
+                if (counter == 2)
+                {
+                    sortedClients[i].clientPoints = 2;
+                    break;
+                }
+            }
+        }
+        // przeiteruj po klientach i dodaj punkty do ich kont w klasie game nie uzywając games bo ni emamy do tego dostepu
+        for (int i = 0; i < static_cast<int>(sortedClients.size()); ++i)
+        {
+            for (const auto &entry : this->connectedClients)
+            {
+                if (entry.second.clientLogin == sortedClients[i].clientLogin)
+                {
+                    const_cast<Client &>(entry.second).clientPoints += sortedClients[i].clientPoints;
+                }
+            }
+        }
+            // wyswietlanie punktow z mapy mapy gier
+            for (const auto &entry : this->connectedClients)
+            {
+                std::cout << "login: " << entry.second.clientLogin << " punkty: " << entry.second.clientPoints << std::endl;
+            }
+     
     };
+   
 };
 
 std::chrono::steady_clock::time_point alarmEndTime;
