@@ -1,12 +1,13 @@
 package org.example;
 
 import javax.swing.*;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.util.concurrent.CountDownLatch;
 
 public class Main {
     public static void main(String[] args) throws IOException {
@@ -25,27 +26,29 @@ public class Main {
     }
     static void threadsMessage(Socket clientSocket, GameFrame gameFrame){
       Thread getMessage=  new Thread(()->{
-            while(true){
-                byte[] buffer = new byte[1024];
-                int bytesRead = 0;
-                try {
-                    // Read bytes from socket
-                    bytesRead = clientSocket.getInputStream().read(buffer);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                if (bytesRead > 0) {
-                    // Convert bytes to string
-                    String message = new String(buffer, 0, bytesRead);
-                    System.out.println("Otrzymano dane od serwera watek: " + message);
-                    messageFromServer(message,gameFrame);
+          while (true) {
+              try {
+                  BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
+                  // Read a line from the socket
+                  String message = reader.readLine();
 
-            }}
+                  if (message != null) {
+                      System.out.println("Otrzymano dane od serwera watek: " + message);
+                      messageFromServer(message, gameFrame);
+                  } else {
+                      // Handle case when the server disconnects
+                      System.out.println("Serwer się rozłączył.");
+                      break;
+                  }
+              } catch (IOException e) {
+                  throw new RuntimeException(e);
+              }
+          }
         });
         getMessage.start();
     }
-   public static void connect(Socket clientSocket, InetSocketAddress serverAddress,GameFrame gameFrame) throws IOException {
+   public static void connect(Socket clientSocket, InetSocketAddress serverAddress,GameFrame gameFrame) {
        SwingUtilities.invokeLater(()->{
 
         while(true){
@@ -67,6 +70,8 @@ public class Main {
             login(clientSocket, out, gameFrame);
             createGame(clientSocket, out, gameFrame);
             firstChose(clientSocket, out, gameFrame);
+            startGame(clientSocket, out, gameFrame);
+            code(clientSocket, out, gameFrame);
                break;
 
         } catch (IOException e) {
@@ -89,6 +94,7 @@ public class Main {
             gameFrame.validate();
             System.out.println("Otrzymano dane od serwera: przechwycenie wiadomosci " + message);
         }
+
         //login jest ok czekamy az gracz jest gotowy
         if(message.equals("ok")){
             gameFrame.setVisible(true);
@@ -100,10 +106,11 @@ public class Main {
         if (message.startsWith("P")){
             gameFrame.setVisible(true);
             gameFrame.makeQuestionPanel(message);
+
             gameFrame.setContentPane(gameFrame.questionPanel);
             gameFrame.validate();
             System.out.println("Otrzymano dane od serwera: przechwycenie wiadomosci " + message);
-
+            gameFrame.questionLabel.setBounds(100,10,300, 70);
 
             gameFrame.a.setBounds(100,100,100, 40);
             gameFrame.b.setBounds(300,100,100, 40);
@@ -111,6 +118,38 @@ public class Main {
             gameFrame.d.setBounds(300,200,100, 40);
 
 
+        }
+        if(message.startsWith("Kod")){
+            gameFrame.setVisible(true);
+            gameFrame.makeGameMasterPanel();
+
+            gameFrame.setContentPane(gameFrame.GameMasterPanel);
+            gameFrame.StartGameButton.setEnabled(false);
+            //ustaw kod pytania
+            gameFrame.GameCodeLabel.setText(message);
+            gameFrame.validate();
+        }
+        if(message.startsWith("G")){
+
+           gameFrame.NumberOfPlayersLabel.setText(message);
+           gameFrame.StartGameButton.setEnabled(true);
+
+
+        }
+        if(message.startsWith("X")){
+            gameFrame.setVisible(true);
+            gameFrame.makeSendCodePanel();
+            gameFrame.setContentPane(gameFrame.sendCodePanel);
+            gameFrame.validate();
+        }
+        if(message.startsWith("Y")){
+            gameFrame.setVisible(true);
+            gameFrame.makeSendCodePanel();
+            gameFrame.sendCodeLabel.setText("Kod jest niepoprawny");
+            gameFrame.setContentPane(gameFrame.sendCodePanel);
+            gameFrame.sendCode.setEnabled(true);
+
+            gameFrame.validate();
         }
         //przechwycenie odpowiedzi
         if (message.startsWith("O")){
@@ -120,6 +159,21 @@ public class Main {
             gameFrame.validate();
             System.out.println("Otrzymano dane od serwera: przechwycenie wiadomosci " + message);
         }
+        //przechwycenie rankingu
+        if(message.startsWith("R")){
+            gameFrame.setVisible(true);
+            gameFrame.makeRankingPanel();
+
+            gameFrame.setContentPane(gameFrame.rankingPanel);
+            //tam gdzie jest w rankingu \t dodaj new line
+            String s = message.replaceAll("\t", "<br>");
+            gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            gameFrame.ranking1.setText("<html>"+s+"<html>");
+            System.out.println(s);
+            gameFrame.validate();
+            System.out.println("Otrzymano dane od serwera: przechwycenie wiadomosci " + message);
+        }
+
         //przechwycenie loginu jak  jest zajety
         if(message.startsWith("N")){
             gameFrame.setVisible(true);
@@ -199,6 +253,14 @@ public class Main {
         });
 
     }
+    static void startGame(Socket clientSocket, PrintWriter out, GameFrame gameFrame){
+        gameFrame.StartGameButton.addActionListener(e -> {
+            out.println("S");
+            System.out.println("Wysłano odpowiedź do serwera: S");
+            gameFrame.StartGameButton.setEnabled(false);
+
+        });
+    }
     static void firstChose(Socket clientSocket, PrintWriter out, GameFrame gameFrame){
         gameFrame.createGameButton.addActionListener(e -> {
             out.println("G");
@@ -214,7 +276,7 @@ public class Main {
     static void login(Socket clientSocket, PrintWriter out, GameFrame gameFrame){
         gameFrame.wyslij.addActionListener(e -> {
             //pole loginu nie może być puste
-            if(gameFrame.login.getText().equals("")){
+            if(gameFrame.login.getText().isEmpty()){
                 gameFrame.connectionLabel.setText("wpisz login");
                 return;
             }
@@ -225,6 +287,15 @@ public class Main {
             gameFrame.connectionLabel.setText("Wysłano login");
             gameFrame.connectionLabel1.setText("Czekaj na pytanie");
             gameFrame.login.setEnabled(false);
+        });
+    }
+    static void code(Socket clientSocket, PrintWriter out, GameFrame gameFrame){
+        gameFrame.sendCode.addActionListener(e -> {
+            String code = gameFrame.sendCodeTextField.getText();
+            code="X"+code;
+            out.println(code);
+            System.out.println("Wysłano odpowiedź do serwera: " + code);
+            gameFrame.sendCode.setEnabled(false);
         });
     }
 
@@ -292,6 +363,7 @@ public class Main {
                 gameFrame.createGameLabel.setText("Wypelnij wszystkie pola");
                 return;
             }
+            //wtynij wsztkie znaki nowej lini
 
 
 

@@ -11,6 +11,15 @@ public class GameFrame extends JFrame{
     JButton ok=new JButton("ok");//ok
     JButton wyslij=new JButton("wyslij");//wyslij
     JButton sendGame=new JButton("wyslij gre");//wyslij gre
+    JButton sendCode=new JButton("wyslij kod");//wyslij kod
+    JPanel sendCodePanel;
+    JLabel sendCodeLabel;
+    JTextField sendCodeTextField;
+
+    JPanel GameMasterPanel;
+    JLabel GameCodeLabel;
+    JLabel NumberOfPlayersLabel;
+    JButton StartGameButton= new JButton("Start");
   JLabel questionLabel;
   JLabel connectionLabel;
   JLabel okLabel;
@@ -19,6 +28,9 @@ public class GameFrame extends JFrame{
   JPanel firstPanel;
   JButton createGameButton;
   JButton joinGameButton;
+  JPanel rankingPanel;
+    JLabel rankingLabel;
+    JLabel ranking1;
 
   JLabel createGameLabel;
   JLabel createQuestion1Label;
@@ -78,6 +90,11 @@ JTextField login;
     public void makeQuestionPanel(String question){
         questionPanel = new JPanel();
         questionLabel = new JLabel(question);
+        //wrap text
+        questionLabel.setSize(100,100);
+        questionLabel.setInputMap(JComponent.WHEN_FOCUSED, null);
+
+
         questionPanel.add(questionLabel);
         questionPanel.add(a);
         questionPanel.add(b);
@@ -105,6 +122,25 @@ JTextField login;
         o.add(ok);
 
     }
+    public void makeSendCodePanel(){
+        sendCodePanel = new JPanel();
+        sendCodeLabel = new JLabel("Podaj kod gry:");
+        sendCodeTextField = new JTextField(10);
+        sendCodePanel.add(sendCodeLabel);
+        sendCodePanel.add(sendCodeTextField);
+        sendCodePanel.add(sendCode);
+    }
+    public void makeGameMasterPanel(){
+        GameMasterPanel = new JPanel();
+        GameCodeLabel = new JLabel("Kod gry: ");
+        NumberOfPlayersLabel = new JLabel("Liczba graczy: ");
+
+        //niedostepny przycisk
+
+        GameMasterPanel.add(GameCodeLabel);
+        GameMasterPanel.add(NumberOfPlayersLabel);
+        GameMasterPanel.add(StartGameButton);
+    }
     public void makeFirstPanel(){
         firstPanel = new JPanel();
         createGameButton = new JButton("Stwórz grę");
@@ -122,19 +158,29 @@ JTextField login;
         waitForAnswerLabel = new JLabel("odpowiedz wyslana posze czekac");
         waitForAnswerPanel.add(waitForAnswerLabel);
     }
+    public void makeRankingPanel(){
+        rankingPanel=new JPanel();
+        rankingLabel=new JLabel("ranking graczy");
+        ranking1=new JLabel("czekaj");
+
+        rankingPanel.add(rankingLabel);
+        rankingPanel.add(ranking1);
+
+
+    }
     public void makeCreateGamePanel() {
         createGamePanel = new JPanel();
-        createGameLabel = new JLabel("Stwórz grę");
-        createQuestion1Label = new JLabel("Pytanie :");
-        createQuestion2Label = new JLabel("Pytanie :");
-        createQuestion3Label = new JLabel("Pytanie :");
-        createQuestion4Label = new JLabel("Pytanie :");
-        createQuestion5Label = new JLabel("Pytanie :");
-        createQuestion1 = new JTextField(10);
-        createQuestion2 = new JTextField(10);
-        createQuestion3 = new JTextField(10);
-        createQuestion4 = new JTextField(10);
-        createQuestion5 = new JTextField(10);
+        createGameLabel = new JLabel("Stwórz grę\n");
+        createQuestion1Label = new JLabel("Pytanie :\n");
+        createQuestion2Label = new JLabel("Pytanie :\n");
+        createQuestion3Label = new JLabel("Pytanie :\n");
+        createQuestion4Label = new JLabel("Pytanie :\n");
+        createQuestion5Label = new JLabel("Pytanie :'n");
+        createQuestion1 = new JTextField(40);
+        createQuestion2 = new JTextField(40);
+        createQuestion3 = new JTextField(40);
+        createQuestion4 = new JTextField(40);
+        createQuestion5 = new JTextField(40);
         //tylko jedna odpowiedz moze byc poprawna
 
         createAnswer1a = new JRadioButton("a");
@@ -218,6 +264,9 @@ JTextField login;
         createGamePanel.add(createAnswer5c);
         createGamePanel.add(createAnswer5d);
 createGamePanel.add(sendGame);
+
+
+
 
 
     }
