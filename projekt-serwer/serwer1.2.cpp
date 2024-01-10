@@ -87,74 +87,94 @@ public:
     std::streampos lastPosition;
 
 public:
+    int playerInGame;
+
+public:
+    int roundNumber;
+
+public:
     Game()
     {
         gameCode = 0;
 
         secondLine = "";
         lastPosition = 0;
+        playerInGame = 0;
+        roundNumber = 0;
     };
     void startGame()
     {
-        std::cout << "Runda rozpoczęta\n";
-        int gameCode = this->gameCode;
-        std::string gameCodeString = std::to_string(gameCode);
-        std::string filename = std::to_string(gameCode) + ".txt";
-        std::cout << "nazwa pliku: " << filename << std::endl;
-        std::fstream file(filename, std::ios::in | std::ios::out | std::ios::app);
-        // Otwórz plik
-        // Ustaw pozycję na początku pliku
-
-        std::string firstLine;
-
-        // Move to the last position in the file
-        file.seekg(this->lastPosition);
-
-        // Read the first line
-        if (std::getline(file, firstLine))
+        if (roundNumber < 5 && this->connectedClients.size() >= 2)
         {
-            // Send the first line to all clients pętla foreach
-            for (auto &entry : this->connectedClients)
-            {
+            std::cout << "Runda rozpoczęta\n";
+            this->roundNumber++;
+            int gameCode = this->gameCode;
+            std::string gameCodeString = std::to_string(gameCode);
+            std::string filename = std::to_string(gameCode) + ".txt";
+            std::cout << "nazwa pliku: " << filename << std::endl;
+            std::fstream file(filename, std::ios::in | std::ios::out | std::ios::app);
+            // Otwórz plik
+            // Ustaw pozycję na początku pliku
 
-                auto &client = entry.second; // Access the client object from the map entry
-                // dodanie znaku nowej linii do pytania
-                if (client.gameMaster == false)
-                {
-                    firstLine += "\n";
-                    std::cout << "Wysłano pytanie do klienta: " << firstLine << std::endl;
-                    send(client.clientSocket, firstLine.c_str(), firstLine.size(), 0);
-                    // zapisz czas rozpoczecia pytania
-                    client.clientTimeStart = std::chrono::high_resolution_clock::now();
-                }
-            }
-            // Read the second line
-            if (std::getline(file, secondLine))
+            std::string firstLine;
+
+            // Move to the last position in the file
+            file.seekg(this->lastPosition);
+
+            // Read the first line
+            if (std::getline(file, firstLine))
             {
-                std::cout << "Odczytano drugą linię z pliku: " << secondLine << std::endl;
+                // Send the first line to all clients pętla foreach
+                for (auto &entry : this->connectedClients)
+                {
+
+                    auto &client = entry.second; // Access the client object from the map entry
+                    // dodanie znaku nowej linii do pytania
+                    if (client.gameMaster == false)
+                    {
+                        firstLine += "\n";
+                        std::cout << "Wysłano pytanie do klienta: " << firstLine << std::endl;
+                        send(client.clientSocket, firstLine.c_str(), firstLine.size(), 0);
+                        // zapisz czas rozpoczecia pytania
+                        client.clientTimeStart = std::chrono::high_resolution_clock::now();
+                    }
+                }
+                // Read the second line
+                if (std::getline(file, secondLine))
+                {
+                    std::cout << "Odczytano drugą linię z pliku: " << secondLine << std::endl;
+                }
+                else
+                {
+                    std::cerr << "brak drugiej lini\n";
+                }
+
+                // Store the current position for the next call
+                this->lastPosition = file.tellg();
+                // zamknij plik
+                file.close();
+                // Set an alarm for 10 s
             }
             else
             {
-                std::cerr << "brak drugiej lini\n";
+                std::cerr << " brak pierwszej\n";
             }
 
-            // Store the current position for the next call
-            this->lastPosition = file.tellg();
-            // zamknij plik
+            // Close the file
             file.close();
-            // Set an alarm for 10 s
+            std::thread timerThread([&]()
+                                    {
+        std::this_thread::sleep_for(std::chrono::seconds(10));
+        
+        endRound(); });
+
+            timerThread.detach();
         }
         else
         {
-            std::cerr << " brak pierwszej\n";
+            std::cout << "funkcja konczaca gre" << std::endl;
+            endGame();
         }
-
-        // Close the file
-        file.close();
-        (void)std::async(std::launch::async, [this]()
-                         {
-        std::this_thread::sleep_for(std::chrono::seconds(10));
-        endRound(); });
     };
 
     void endRound()
@@ -175,10 +195,7 @@ public:
                 {
                     std::cout << "Odpowiedź klienta jest poprawna!\n";
                     // pokaz czas klienta
-                    std::cout << "Czas klienta: " << client.clientTime << " seconds" << std::endl;
-                    std::cout << "Czas początkowy klienta: " << client.clientTimeStart.time_since_epoch().count() << " ns" << std::endl;
-                    std::cout << "Czas końcowy klienta: " << client.clientTimeEnd.time_since_epoch().count() << " ns" << std::endl;
-                    std::cout << "login w endround: " << client.clientLogin << std::endl;
+
                     std::string poprawna = "Odpowiedź klienta jest poprawna!\n";
                     send(client.clientSocket, poprawna.c_str(), poprawna.size(), 0);
                 }
@@ -187,7 +204,7 @@ public:
                     std::cout << "Odpowiedź klienta jest niepoprawna.\n";
                     // pokaz czas klienta
                     std::cout << "Czas klienta: " << client.clientTime << std::endl;
-                    std::cout << "login w endround: " << client.clientLogin << std::endl;
+
                     std::string niepoprawna = "Odpowiedź klienta jest niepoprawna.\n";
                     send(client.clientSocket, niepoprawna.c_str(), niepoprawna.size(), 0);
                 }
@@ -209,11 +226,14 @@ public:
         std::vector<Client> sortedClients;
         for (const auto &entry : this->connectedClients)
         {
-            sortedClients.push_back(entry.second);
+            if (connectedClients[entry.first].gameMaster == false)
+            {
+                sortedClients.push_back(entry.second);
+            }
         }
         std::sort(sortedClients.begin(), sortedClients.end(), [](const Client &a, const Client &b)
                   { return a.clientTime < b.clientTime; });
-        //dla posortowanego wektora zmnien punkty na 0
+        // dla posortowanego wektora zmnien punkty na 0
         for (int i = 0; i < static_cast<int>(sortedClients.size()); ++i)
         {
             sortedClients[i].clientPoints = 0;
@@ -224,8 +244,8 @@ public:
         {
             if (sortedClients[i].clientAnswer[0] == secondLine[0])
             {
-                std::cout<<"dodano punkty"<<sortedClients[i].clientLogin<<"odp"<<sortedClients[i].clientAnswer[0]<<std::endl;
-                std::cout<<"poprawna odp"<<secondLine[0]<<std::endl;
+                // std::cout << "dodano punkty" << sortedClients[i].clientLogin << "odp" << sortedClients[i].clientAnswer[0] << std::endl;
+                // std::cout << "poprawna odp" << secondLine[0] << std::endl;
                 sortedClients[i].clientPoints = +1;
             }
         }
@@ -259,14 +279,67 @@ public:
                 }
             }
         }
-            // wyswietlanie punktow z mapy mapy gier
-            for (const auto &entry : this->connectedClients)
+        // wyswietlanie punktow z mapy mapy gier
+        for (const auto &entry : this->connectedClients)
+        {
+            const auto &client = entry.second;
+            if (client.gameMaster == false)
             {
-                std::cout << "login: " << entry.second.clientLogin << " punkty: " << entry.second.clientPoints << std::endl;
+                std::cout << "login: " << client.clientLogin << " punkty: " << client.clientPoints << std::endl;
             }
-     
+        }
+
+        // wyslij punkty do gamemastra
+        for (const auto &entry : this->connectedClients)
+        {
+            const auto &client = entry.second;
+            if (client.gameMaster == true)
+            {
+                std::string ranking = "Ranking\t";
+                for (const auto &entry1 : this->connectedClients)
+                {
+                    const auto &client1 = entry1.second;
+
+                    if (client1.gameMaster == false)
+                    {
+                        ranking = ranking + " login: " + client1.clientLogin + " punkty: " + std::to_string(client1.clientPoints) + "\t";
+                    }
+                }
+                ranking = ranking + "\n";
+                ssize_t bytesSent = send(client.clientSocket, ranking.c_str(), ranking.size(), 0);
+                if (bytesSent == -1)
+                {
+                    perror("Error sending ranking to game master");
+                }
+                std::cout << "wyslano ranking do gamemastera" << ranking << std::endl;
+            }
+        }
     };
-   
+    void endGame()
+    {
+        std::string ranking = "Ranking\t";
+        for (const auto &entry1 : this->connectedClients)
+        {
+            const auto &client1 = entry1.second;
+
+            if (client1.gameMaster == false)
+            {
+                ranking = ranking + " login: " + client1.clientLogin + " punkty: " + std::to_string(client1.clientPoints) + "\t";
+            }
+        }
+        ranking = ranking + "KONIEC GRY!\n";
+        // wyslij ranking do wszystkich klientow
+        for (const auto &entry : this->connectedClients)
+        {
+            const auto &client = entry.second;
+            ssize_t bytesSent = send(client.clientSocket, ranking.c_str(), ranking.size(), 0);
+            if (bytesSent == -1)
+            {
+                perror("Error sending ranking to game master");
+            }
+            std::cout << "wyslano ranking do klienta" << ranking << std::endl;
+        }
+    };
 };
 
 std::chrono::steady_clock::time_point alarmEndTime;
@@ -412,13 +485,22 @@ int main()
                 else if (bytesRead == 0)
                 {
                     // Connection closed by the client
+                    int gameCode = connectedClients[clientSocket].gameCode;
+
+                    // Check if the game with the specified code exists
+                    if (games.count(gameCode) != 0)
+                    {
+                        // Remove the client from the connectedClients map in the corresponding game
+                        games[gameCode].connectedClients.erase(clientSocket);
+                    }
+
+                    // Remove the client from the overall connectedClients map
+                    connectedClients.erase(clientSocket);
                     std::cout << "Client " << clientSocket << " disconnected" << std::endl;
                     // przestan odbierac wiadomosci od tego klienta
                     epoll_ctl(epollFd, EPOLL_CTL_DEL, clientSocket, &epollEvent);
                     // zamknij gniazdo klienta
                     close(clientSocket);
-                    // usun klienta z listy
-                    connectedClients.erase(clientSocket);
 
                     break;
                 }
@@ -466,8 +548,9 @@ int main()
                         std::cout << "wyslano ilosc aktywnych do gamemastera" << std::endl;
                         std::string activePlayers = "GIlosc aktywnych graczy:" + std::to_string(games[connectedClients[i].gameCode].clientsReady.size()) + "\n";
                         send(connectedClients[i].clientSocket, activePlayers.c_str(), activePlayers.size(), 0);
-                        int clientSocket1 = connectedClients[i].clientSocket;
-                        games[connectedClients[clientSocket1].gameCode].connectedClients[clientSocket1].gameMaster = true;
+                        //   int clientSocket1 = connectedClients[i].clientSocket;
+                        //  games[connectedClients[i].gameCode].connectedClients[clientSocket1].gameMaster = true;
+                        //       games[connectedClients[i].gameCode].connectedClients[clientSocket1].clientSocket =clientSocket1;
                         break;
                     }
                 }
@@ -528,28 +611,37 @@ int main()
                 std::string gameCodeString = clientResponse1;
                 gameCodeString.erase(0, 1);
                 gameCodeString.erase(gameCodeString.size() - 1, 1);
-                int gameCode = std::stoi(gameCodeString);
-                std::cout << "kod gry: " << gameCode << std::endl;
-                // sprawdz czy istnieje gra o takim kodzie
-                if (games.count(gameCode) != 0)
+                try
                 {
-                    // dodaj klienta do gry
+                    int gameCode = std::stoi(gameCodeString);
+                    std::cout << "kod gry: " << gameCode << std::endl;
+                    // sprawdz czy istnieje gra o takim kodzie
+                    if (games.count(gameCode) != 0)
+                    {
+                        // dodaj klienta do gry
 
-                    connectedClients[clientSocket].gameCode = gameCode;
-                    // dodaj klienta do gry
-                    games[gameCode].connectedClients.insert(std::pair<int, Client>(clientSocket, connectedClients[clientSocket]));
-                    // pokaz kod gry
-                    std::cout << "kod gry: " << games[gameCode].gameCode << std::endl;
-                    // wyslij klientowi informacje o tym ze jest w grze
+                        connectedClients[clientSocket].gameCode = gameCode;
+                        // dodaj klienta do gry
+                        games[gameCode].connectedClients.insert(std::pair<int, Client>(clientSocket, connectedClients[clientSocket]));
+                        // pokaz kod gry
+                        std::cout << "kod gry: " << games[gameCode].gameCode << std::endl;
+                        // wyslij klientowi informacje o tym ze jest w grze
 
-                    std::cout << "wyslano ok do klienta" << std::endl;
-                    std::string gameCodeOK = "ok\n";
-                    send(clientSocket, gameCodeOK.c_str(), gameCodeOK.size(), 0);
+                        std::cout << "wyslano ok do klienta" << std::endl;
+                        std::string gameCodeOK = "ok\n";
+                        send(clientSocket, gameCodeOK.c_str(), gameCodeOK.size(), 0);
+                    }
+                    else
+                    {
+                        std::string gameCodeNO = "Y\n";
+                        send(clientSocket, gameCodeNO.c_str(), gameCodeNO.size(), 0);
+                    }
                 }
-                else
+                catch (const std::invalid_argument &e)
                 {
                     std::string gameCodeNO = "Y\n";
                     send(clientSocket, gameCodeNO.c_str(), gameCodeNO.size(), 0);
+                    continue;
                 }
             }
             //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -577,6 +669,12 @@ int main()
                     std::string questionAdded = "Kod gry:" + std::to_string(connectedClients[clientSocket].gameCode) + "\n";
                     send(connectedClients[clientSocket].clientSocket, questionAdded.c_str(), questionAdded.size(), 0);
                     connectedClients[clientSocket].gameMasterQuestionCounter = 0;
+                    // dodaj gamemastera do gry
+                    games[gameCode].connectedClients.insert(std::pair<int, Client>(clientSocket, connectedClients[clientSocket]));
+                    // ustaw gamemaster na true
+                    games[connectedClients[clientSocket].gameCode].connectedClients[clientSocket].gameMaster = true;
+
+                    games[connectedClients[clientSocket].gameCode].connectedClients[clientSocket].clientSocket = clientSocket;
                 }
                 if (connectedClients[clientSocket].gameCode == 0)
                 {
@@ -620,7 +718,7 @@ int main()
                 std::cout << "klient " << clientSocket << " jest gamemasterem" << std::endl;
                 // nadaj klientowi role gamemastera
                 connectedClients[clientSocket].gameMaster = true;
-                games[connectedClients[clientSocket].gameCode].connectedClients[clientSocket].gameMaster = true;
+                //   games[connectedClients[clientSocket].gameCode].connectedClients[clientSocket].gameMaster = true;
 
                 // przejscie do tworzenia gry i wyslanie c do klienta
                 std::string C = "C\n";
