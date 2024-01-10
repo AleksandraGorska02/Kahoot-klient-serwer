@@ -93,6 +93,9 @@ public:
     int roundNumber;
 
 public:
+    int answeredPlayersCount;
+
+public:
     Game()
     {
         gameCode = 0;
@@ -100,6 +103,7 @@ public:
         secondLine = "";
         lastPosition = 0;
         playerInGame = 0;
+        answeredPlayersCount = 0;
         roundNumber = 0;
     };
     void startGame()
@@ -162,14 +166,35 @@ public:
 
             // Close the file
             file.close();
+              this->answeredPlayersCount = 0;
+            auto startTime = std::chrono::high_resolution_clock::now();
+
+            // ...
+
             std::thread timerThread([&]()
                                     {
-        std::this_thread::sleep_for(std::chrono::seconds(10));
-        
-        endRound(); });
+        while (true) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+            // Check if 2/3 players have answered
+            if (this->answeredPlayersCount >= 2 * this->connectedClients.size() / 3) {
+                endRound();
+              
+                break;
+            }
+
+            auto currentTime = std::chrono::high_resolution_clock::now();
+            auto elapsedTime = std::chrono::duration_cast<std::chrono::seconds>(currentTime - startTime).count();
+
+            if (elapsedTime >= 10) {  
+                endRound();
+                break;
+            }
+        } });
 
             timerThread.detach();
         }
+
         else
         {
             std::cout << "funkcja konczaca gre" << std::endl;
@@ -576,6 +601,7 @@ int main()
                 games[connectedClients[clientSocket].gameCode].connectedClients[clientSocket].clientTimeEnd = std::chrono::high_resolution_clock::now();
                 auto time = std::chrono::duration_cast<std::chrono::seconds>(games[connectedClients[clientSocket].gameCode].connectedClients[clientSocket].clientTimeEnd - games[connectedClients[clientSocket].gameCode].connectedClients[clientSocket].clientTimeStart).count();
                 games[connectedClients[clientSocket].gameCode].connectedClients[clientSocket].clientTime = static_cast<double>(time);
+                games[connectedClients[clientSocket].gameCode].answeredPlayersCount++;
             }
 
             //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -616,9 +642,8 @@ int main()
                     int gameCode = std::stoi(gameCodeString);
                     std::cout << "kod gry: " << gameCode << std::endl;
                     // sprawdz czy istnieje gra o takim kodzie
-                    if (games.count(gameCode) != 0)
+                    if (games.count(gameCode) != 0 && games[gameCode].connectedClients.size() <= 10)
                     {
-                        // dodaj klienta do gry
 
                         connectedClients[clientSocket].gameCode = gameCode;
                         // dodaj klienta do gry
