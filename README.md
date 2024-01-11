@@ -1,4 +1,8 @@
 # Kahoot
+* [PL](#PL)
+* [ENG](#ENG)
+
+## PL
 
 ## Table of Contents
 * [General Info](#general-information)
@@ -54,3 +58,59 @@ Na koniec gry wyświetlany jest ranking (zgodnie z kolejnością dołączania do
 
 ## Room for Improvement
 Jako dalszy rozwój projektu można by uwzględnić możliwość tworzenia quizzów z różną liczbą pytań.
+
+---------------------------------------------------------------------------------------------------------------------------
+## ENG
+
+## Table of Contents
+* [General Info](#general-information)
+* [Technologies Used](#technologies)
+* [Setup](#setup)
+* [Usage](#usage)
+* [Room for Improvement](#room-for-improvement)
+
+## General Information
+This project focuses on creating a server and client for quiz games. They allow users to create new games or join existing ones, similarly to the popular platform Kahoot.
+
+
+## Technologies
+In the project, client-server communication is done using the TCP protocol. The epoll function is utilized for handling input and output.
+
+
+## Setup
+...
+
+
+## Usage
+### Creating new quizz
+When a user starts the game, they can choose one of two options displayed on the screen.
+![Example screenshot](./img/welcome_page.png)
+
+If the user selects the *Stwórz grę* option, a form will open where they can enter their questions with answers and mark the correct one. Then, they should click the *wyślij grę* button.
+![Example screenshot](./img/question_form.png)
+
+After creating the game, the user will see the game code assigned to their quiz and the number of players who have joined. The person responsible for creating the game can start the quiz by clicking the *Start* button.
+![Example screenshot](./img/waiting_for_players.png)
+
+### Joining quizz
+The second option available to users after launching the application is to join an existing quiz. After choosing the *Dołącz do gry* option, the player must enter any chosen login (if the login already exists, the player will be informed and must enter a different one).
+
+![Example screenshot](./img/login.png)
+
+The next step is to enter the game code to which the user wants to join.
+
+![Example screenshot](./img/game_code.png)
+
+After providing the correct code, the player can confirm readiness to play and, when the quiz starts by the game master, receive a question with the option to select the chosen answer.
+
+![Example screenshot](./img/ready.png)
+
+![Example screenshot](./img/q1.png)
+
+
+Players can join the game during the quiz; however, for all questions that others have already answered, they will receive 0 points, and the score will be calculated from the first question received after joining.
+At the end of the game, a ranking is displayed (in the order of joining the game), including the names of players who participated in the quiz and the points they received.
+
+
+## Room for Improvement
+As a further development of the project, it would be possible to include the option to create quizzes with a various number of questions.
