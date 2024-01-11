@@ -78,6 +78,9 @@ public:
     std::map<int, Client> connectedClients;
 
 public:
+    bool hasGamemaster;
+
+public:
     std::set<int> clientsReady;
 
 public:
@@ -105,6 +108,7 @@ public:
         playerInGame = 0;
         answeredPlayersCount = 0;
         roundNumber = 0;
+        hasGamemaster = true;
     };
     void startGame()
     {
@@ -166,7 +170,7 @@ public:
 
             // Close the file
             file.close();
-              this->answeredPlayersCount = 0;
+            this->answeredPlayersCount = 0;
             auto startTime = std::chrono::high_resolution_clock::now();
 
             // ...
@@ -514,7 +518,11 @@ int main()
 
                     // Check if the game with the specified code exists
                     if (games.count(gameCode) != 0)
-                    {
+                    { // rozłączenie gamemastera
+                        if (games[gameCode].hasGamemaster == true && games[gameCode].connectedClients[clientSocket].gameMaster == true)
+                        {
+                            games[gameCode].hasGamemaster == false;
+                        }
                         // Remove the client from the connectedClients map in the corresponding game
                         games[gameCode].connectedClients.erase(clientSocket);
                     }
@@ -562,6 +570,13 @@ int main()
                 // nadaj login klientowi
                 std::string login = connectedClients[clientSocket].clientLogin;
                 games[connectedClients[clientSocket].gameCode].connectedClients[clientSocket].clientLogin = login;
+                if (games[connectedClients[clientSocket].gameCode].clientsReady.size() == games[connectedClients[clientSocket].gameCode].connectedClients.size() && games[connectedClients[clientSocket].gameCode].hasGamemaster == false)
+                {
+                    std::thread t(&Game::startGame, &games[connectedClients[clientSocket].gameCode]);
+                    t.detach();
+
+                    std::cout << "rozpoczeto gre " << std::to_string(games[connectedClients[clientSocket].gameCode].gameCode) << std::endl;
+                }
 
                 // znajdz gamemastera
                 // znajdz gamemastera klienta o podanym kodzie gry
