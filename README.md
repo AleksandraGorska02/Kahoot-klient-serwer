@@ -14,7 +14,7 @@ Projekt ten skupia się na stworzeniu serwera do gry w quizy oraz klientów, kt�
 
 
 ## Technologies
-W projekcie komunikacja klient-serwer odbywa się z wykorzystaniem protokołu TCP. Do obsługi wejścia oraz wyjśćia została wykorzystana funkcja *epoll*.
+W projekcie komunikacja klient-serwer odbywa się z wykorzystaniem protokołu TCP. Do obsługi wejścia oraz wyjścia została wykorzystana funkcja *epoll*.
 
 
 ## Setup
@@ -23,8 +23,10 @@ W projekcie komunikacja klient-serwer odbywa się z wykorzystaniem protokołu TC
 
 ## Usage
 Użytkownik uruchamiając grę może wybrac jedną z dwóch opcji, które pokażą mu się na ekranie. 
-![Example screenshot](./img/home_page.png)
+![Example screenshot](./img/welcome_page.png)
 
+Jeśli użytkownik wybierze opcję *Stwórz grę*, otworzy mu się formularz, w którym może wpisać swoje pytania z odpowiedziami oraz zaznaczyć, która odpowiedź jest poprawna. Następnie powinien kliknąć przycisk *wyślij grę*.
+![Example screenshot](./img/question_form.png)
 
 
 ## Room for Improvement
