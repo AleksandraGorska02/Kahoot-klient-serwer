@@ -79,7 +79,7 @@ JTextField login;
 
 
     GameFrame(int width,int height){
-        super("example");
+        super("Kahoot");
         this.setSize(width,height);
         this.setLocation(50,50);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -90,7 +90,7 @@ JTextField login;
 
     public void makeQuestionPanel(String question){
         questionPanel = new JPanel();
-        //co 40 znakow nowa linia
+
         for (int i = 0; i < question.length(); i++) {
             if (i % 70 == 0 && i != 0) {
                 question = question.substring(0, i) + "<br>" + question.substring(i);

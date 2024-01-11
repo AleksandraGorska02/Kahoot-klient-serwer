@@ -240,6 +240,11 @@ public class Main {
                 gameFrame.connectionLabel.setText("wpisz login");
                 return;
             }
+            //login nie może być dłuższy niż 10 znaków
+            if(gameFrame.login.getText().length()>20){
+                gameFrame.connectionLabel.setText("login nie może być dłuższy niż 20 znaków");
+                return;
+            }
             String login = "L"+gameFrame.login.getText();
             out.println(login);
             System.out.println("Wysłano odpowiedź do serwera: " + login);
@@ -323,10 +328,11 @@ public class Main {
                 gameFrame.createGameLabel.setText("Wypelnij wszystkie pola");
                 return;
             }
-            //wtynij wsztkie znaki nowej lini
-
-
-
+            //wiadomosc nie moze byc dłuższa niz 100 znakow
+            if(question1.length()>100||question2.length()>100||question3.length()>100||question4.length()>100||question5.length()>100){
+                gameFrame.createGameLabel.setText("Pytanie nie może być dłuższe niż 100 znaków");
+                return;
+            }
             String QandA1= "P1"+question1+answer1+"\n";
 
             String QandA2= "P2"+question2+answer2+"\n";
