@@ -33,7 +33,17 @@ Po stworzeniu gry użytkownikowi wyświetli się Kod gry, który został przydzi
 ![Example screenshot](./img/waiting_for_players.png)
 
 ### Joining quizz
-Drugą opcją, któa jest dostępna dla użytkownika po uruchomieniu aplikacji jest dołączenie do już istniejącego quizzu. Po wybraniu opcji *Dołącz do gry*, gracz musi wpisać dowolnie wybrany login (jeśli dany login już istnieje gracz zostanie o tym poinformowany i będzie musiał wpisać inny). Następnym krokiem jest wpisanie kodu gry do jakiej użytkownik chce dołączyć. Po podaniu właściwego kodu gracz może potwierdzić gotowość do gry i po rozpoczęciu quizzu przez gamemastera otrzyma pytanie wraz z możliwością zaznaczenia wybranej odpowiedzi.
+Drugą opcją, któa jest dostępna dla użytkownika po uruchomieniu aplikacji jest dołączenie do już istniejącego quizzu. Po wybraniu opcji *Dołącz do gry*, gracz musi wpisać dowolnie wybrany login (jeśli dany login już istnieje gracz zostanie o tym poinformowany i będzie musiał wpisać inny).
+
+![Example screenshot](./img/login.png)
+
+Następnym krokiem jest wpisanie kodu gry do jakiej użytkownik chce dołączyć. 
+![Example screenshot](./img/game_code.png)
+
+Po podaniu właściwego kodu gracz może potwierdzić gotowość do gry i po rozpoczęciu quizzu przez gamemastera otrzyma pytanie wraz z możliwością zaznaczenia wybranej odpowiedzi.
+
+![Example screenshot](./img/ready.png)
+
 
 Do gry można dołączyć w czasie trwania quizzu jednak wtedy za wszystkie pytania, na które inni użytkownicy już odpowiedzieli otrzyma się 0 punktów i wynik będzie liczony od pierwszego otrzymanego pytania po dołączniu.
 Na koniec gry wyświetlany jest ranking, który zawiera nazwy graczy, którzy brali udział w quizzie oraz otrzymane przez nich punkty.
