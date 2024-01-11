@@ -182,7 +182,7 @@ public:
             std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
             // Check if 2/3 players have answered
-            if (this->answeredPlayersCount >= 2 * static_cast <double>(this->connectedClients.size()) / 3) {
+            if (this->answeredPlayersCount >= 2 * static_cast <int>(this->connectedClients.size()) / 3) {
                 endRound();
               
                 break;
@@ -539,6 +539,15 @@ int main()
                         }
                         // Remove the client from the connectedClients map in the corresponding game
                         games[gameCode].connectedClients.erase(clientSocket);
+                    }
+                    //usun login z listy
+                    for (auto it = logins.begin(); it != logins.end(); ++it)
+                    {
+                        if (*it == connectedClients[clientSocket].clientLogin)
+                        {
+                            logins.erase(it);
+                            break;
+                        }
                     }
 
                     // Remove the client from the overall connectedClients map
