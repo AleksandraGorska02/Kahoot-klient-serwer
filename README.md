@@ -22,8 +22,28 @@ W projekcie komunikacja klient-serwer odbywa się z wykorzystaniem protokołu TC
 
 
 ## Konfiguracja
-...
+### Serwer
+Do zbudowania oraz uruchomienia serwera potrzebne jest wykonanie kilku komend. Najpierw należy otworzyć terminal w [katalogu serwera](./projekt-serwer) a następnie kolejno wykonać poniższe komendy:
 
+- Utworz katalog *build*:
+  
+  `mkdir build`
+  
+- Przejdź do nowo stworzonego katalogu:
+  
+  `cd build`
+  
+- Skonfiguruj projekt za pomocą CMake:
+
+  `cmake ..`
+
+- Skompiluj projekt:
+
+  `cmake --build`
+
+- **Uruchom serwer:**
+
+  `./serwer`
 
 ## Użycie
 ### Tworzenie nowego quizu
@@ -78,7 +98,28 @@ In the project, client-server communication is done using the TCP protocol. The 
 
 
 ## Setup
-...
+### Server
+To build and run the server, you need to execute a series of commands. First, open the terminal in the [server directory](./projekt-serwer) and then follow the commands below:
+
+- Create the *build* directory:
+  
+  `mkdir build`
+  
+- Navigate to the newly created directory:
+  
+  `cd build`
+  
+- Configure the project using CMake:
+
+  `cmake ..`
+
+- Compile the project:
+
+  `cmake --build`
+
+- **Run the server:**
+
+  `./serwer`
 
 
 ## Usage
