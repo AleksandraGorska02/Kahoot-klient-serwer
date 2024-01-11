@@ -521,7 +521,7 @@ int main()
                     { // rozłączenie gamemastera
                         if (games[gameCode].hasGamemaster == true && games[gameCode].connectedClients[clientSocket].gameMaster == true)
                         {
-                            games[gameCode].hasGamemaster == false;
+                            games[gameCode].hasGamemaster = false;
                         }
                         // Remove the client from the connectedClients map in the corresponding game
                         games[gameCode].connectedClients.erase(clientSocket);
