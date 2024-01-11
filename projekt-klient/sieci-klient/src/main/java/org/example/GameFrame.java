@@ -85,14 +85,21 @@ JTextField login;
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 
+
     }
 
     public void makeQuestionPanel(String question){
         questionPanel = new JPanel();
-        questionLabel = new JLabel(question);
-        //wrap text
-        questionLabel.setSize(100,100);
-        questionLabel.setInputMap(JComponent.WHEN_FOCUSED, null);
+        //co 40 znakow nowa linia
+        for (int i = 0; i < question.length(); i++) {
+            if (i % 70 == 0 && i != 0) {
+                question = question.substring(0, i) + "<br>" + question.substring(i);
+            }
+        }
+
+        questionLabel = new JLabel("<html>"+question+"</html>");
+
+
 
 
         questionPanel.add(questionLabel);
@@ -171,11 +178,11 @@ JTextField login;
     public void makeCreateGamePanel() {
         createGamePanel = new JPanel();
         createGameLabel = new JLabel("Stwórz grę\n");
-        createQuestion1Label = new JLabel("Pytanie :\n");
-        createQuestion2Label = new JLabel("Pytanie :\n");
-        createQuestion3Label = new JLabel("Pytanie :\n");
-        createQuestion4Label = new JLabel("Pytanie :\n");
-        createQuestion5Label = new JLabel("Pytanie :'n");
+        createQuestion1Label = new JLabel("Pytanie :");
+        createQuestion2Label = new JLabel("Pytanie :");
+        createQuestion3Label = new JLabel("Pytanie :");
+        createQuestion4Label = new JLabel("Pytanie :");
+        createQuestion5Label = new JLabel("Pytanie :");
         createQuestion1 = new JTextField(40);
         createQuestion2 = new JTextField(40);
         createQuestion3 = new JTextField(40);
