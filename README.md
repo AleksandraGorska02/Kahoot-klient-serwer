@@ -18,10 +18,12 @@ W projekcie komunikacja klient-serwer odbywa się z wykorzystaniem protokołu TC
 
 
 ## Setup
-
+...
 
 
 ## Usage
+Użytkownik uruchamiając grę może wybrac jedną z dwóch opcji, które pokażą mu się na ekranie. 
+![Example screenshot](./img/home_page.png)
 
 
 
