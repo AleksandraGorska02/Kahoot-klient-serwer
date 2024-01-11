@@ -23,7 +23,7 @@ W projekcie komunikacja klient-serwer odbywa się z wykorzystaniem protokołu TC
 
 ## Konfiguracja
 ### Serwer
-Do zbudowania oraz uruchomienia serwera potrzebne jest wykonanie kilku komend. Najpierw należy otworzyć terminal w [katalogu serwera](./projekt_serwer) a następnie kolejno wykonać poniższe komendy:
+Do zbudowania oraz uruchomienia serwera potrzebne jest wykonanie kilku komend. Najpierw należy otworzyć terminal w [katalogu serwera](./projekt-serwer) a następnie kolejno wykonać poniższe komendy:
 
 - Utworz katalog *build*:
   
@@ -99,7 +99,7 @@ In the project, client-server communication is done using the TCP protocol. The 
 
 ## Setup
 ### Server
-To build and run the server, you need to execute a series of commands. First, open the terminal in the [server directory](./projekt_serwer) and then follow the commands below:
+To build and run the server, you need to execute a series of commands. First, open the terminal in the [server directory](./projekt-serwer) and then follow the commands below:
 
 - Create the *build* directory:
   
