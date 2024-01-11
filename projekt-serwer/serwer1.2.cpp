@@ -600,7 +600,7 @@ int main()
                     {
                         // wyslij do gamemastera ilosc aktywnych graczy
                         std::cout << "wyslano ilosc aktywnych do gamemastera" << std::endl;
-                        std::string activePlayers = "GIlosc aktywnych graczy:" + std::to_string(games[connectedClients[i].gameCode].clientsReady.size()) + "\n";
+                        std::string activePlayers = "Gracze aktywni:" + std::to_string(games[connectedClients[i].gameCode].clientsReady.size()) + "\n";
                         send(connectedClients[i].clientSocket, activePlayers.c_str(), activePlayers.size(), 0);
                         //   int clientSocket1 = connectedClients[i].clientSocket;
                         //  games[connectedClients[i].gameCode].connectedClients[clientSocket1].gameMaster = true;
@@ -799,6 +799,7 @@ int main()
 
                 std::cout << "rozpoczeto gre " << std::to_string(games[connectedClients[clientSocket].gameCode].gameCode) << std::endl;
             }
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
     }
 
