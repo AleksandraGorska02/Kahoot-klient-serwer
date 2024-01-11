@@ -4,29 +4,29 @@
 
 ## PL
 
-## Table of Contents
-* [General Info](#general-information)
-* [Technologies Used](#technologies)
-* [Setup](#setup)
-* [Usage](#usage)
-* [Room for Improvement](#room-for-improvement)
+## Spis treści
+* [Informacje ogólne](#Informacje-ogólne)
+* [Wykorzystane technologie](#Wykorzystane-technologie)
+* [Konfiguracja](#Konfiguracja)
+* [Użycie](#Użycie)
+* [Potencjalny rozwój na przyszłość](#Potencjalny-rozwój-na-przyszłość)
 
 
 
-## General Information
+## Informacje ogólne
 Projekt ten skupia się na stworzeniu serwera oraz klienta do gry w quizzy. Pozwalają one tworzyć nowe gry lub dołączać do istniejących, podobnie jak popularna platforma Kahoot.
 
 
-## Technologies
+## Wykorzystane technologie
 W projekcie komunikacja klient-serwer odbywa się z wykorzystaniem protokołu TCP. Do obsługi wejścia oraz wyjścia została wykorzystana funkcja *epoll*.
 
 
-## Setup
+## Konfiguracja
 ...
 
 
-## Usage
-### Creating new quizz
+## Użycie
+### Tworzenie nowego quizu
 Użytkownik uruchamiając grę może wybrac jedną z dwóch opcji, które pokażą mu się na ekranie. 
 ![Example screenshot](./img/welcome_page.png)
 
@@ -36,7 +36,7 @@ Jeśli użytkownik wybierze opcję *Stwórz grę*, otworzy mu się formularz, w 
 Po stworzeniu gry użytkownikowi wyświetli się Kod gry, który został przydzielony do jego quizzu oraz liczba graczy, która dołączyła do gry. Osoba odpowiedzialna za stworzenie gry może uruchomić quizz klikając przycisk *Start*.
 ![Example screenshot](./img/waiting_for_players.png)
 
-### Joining quizz
+### Dołączanie do quizu
 Drugą opcją, któa jest dostępna dla użytkownika po uruchomieniu aplikacji jest dołączenie do już istniejącego quizzu. Po wybraniu opcji *Dołącz do gry*, gracz musi wpisać dowolnie wybrany login (jeśli dany login już istnieje gracz zostanie o tym poinformowany i będzie musiał wpisać inny).
 
 ![Example screenshot](./img/login.png)
@@ -56,7 +56,7 @@ Do gry można dołączyć w czasie trwania quizzu jednak wtedy za wszystkie pyta
 Na koniec gry wyświetlany jest ranking (zgodnie z kolejnością dołączania do gry), który zawiera nazwy graczy, którzy brali udział w quizzie oraz otrzymane przez nich punkty.
 
 
-## Room for Improvement
+## Potencjalny rozwój na przyszłość
 Jako dalszy rozwój projektu można by uwzględnić możliwość tworzenia quizzów z różną liczbą pytań.
 
 ---------------------------------------------------------------------------------------------------------------------------
