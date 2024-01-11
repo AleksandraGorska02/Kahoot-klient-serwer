@@ -10,7 +10,7 @@
 
 
 ## General Information
-Projekt ten skupia się na stworzeniu serwera do gry w quizzy oraz klientów, które pozwalają użytkownikom tworzyć nowe gry lub dołączać do istniejących, podobnie jak popularna platforma Kahoot.
+Projekt ten skupia się na stworzeniu serwera oraz klienta do gry w quizzy. Pozwalają one tworzyć nowe gry lub dołączać do istniejących, podobnie jak popularna platforma Kahoot.
 
 
 ## Technologies
