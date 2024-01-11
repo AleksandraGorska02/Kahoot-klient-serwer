@@ -68,6 +68,7 @@ public:
         gameMasterQuestionCounter = 0;
     };
 };
+void deleteGame(int gameCode);
 // klasa gry
 class Game
 {
@@ -181,7 +182,7 @@ public:
             std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
             // Check if 2/3 players have answered
-            if (this->answeredPlayersCount >= 2 * this->connectedClients.size() / 3) {
+            if (this->answeredPlayersCount >= 2 * static_cast <double>(this->connectedClients.size()) / 3) {
                 endRound();
               
                 break;
@@ -368,10 +369,17 @@ public:
             }
             std::cout << "wyslano ranking do klienta" << ranking << std::endl;
         }
+       //usuń grę z mapy gier
+       deleteGame(this->gameCode);
+          
+    //usuń plik z pytaniami
+        std::string filename = std::to_string(this->gameCode) + ".txt";
+        remove(filename.c_str());
+
+
     };
 };
 
-std::chrono::steady_clock::time_point alarmEndTime;
 
 std::map<int, Client> connectedClients; // Store connected clients
 std::set<int> clientsReady;
@@ -380,6 +388,12 @@ std::set<int> clientsReady;
 std::vector<std::string> logins;
 // mapa gier i ich kodów
 std::map<int, Game> games;
+void deleteGame(int gameCode){
+    
+    games.erase(gameCode);
+    std::cout << "usunieto gre" << std::endl;
+
+}
 
 bool checkLogin(std::string login)
 {
