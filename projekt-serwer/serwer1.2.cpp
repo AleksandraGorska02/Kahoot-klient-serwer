@@ -744,10 +744,18 @@ std::cout << "Serwer uruchomiony\n";
                 }
                 if (connectedClients[clientSocket].gameCode == 0)
                 {
-                    // kod to 4 losowe cyfry
+                    while(true){
+                         // kod to 4 losowe cyfry
                     srand(time(NULL));
                     gameCode = rand() % 9000 + 1000;
-                    connectedClients[clientSocket].gameCode = gameCode;
+                    if(gameCode!=0 && games.count(gameCode)==0){
+                        connectedClients[clientSocket].gameCode = gameCode;
+                        break;
+                    }
+                    
+                    }
+                   
+                    
 
                     // stwoz gre
                     Game game;
