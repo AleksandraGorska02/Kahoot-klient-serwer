@@ -39,7 +39,7 @@ Do zbudowania oraz uruchomienia serwera potrzebne jest wykonanie kilku komend. N
 
 - Skompiluj projekt:
 
-  `cmake --build`
+  `cmake --build .`
 
 - **Uruchom serwer:**
 
