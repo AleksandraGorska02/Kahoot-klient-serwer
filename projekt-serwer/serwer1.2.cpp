@@ -406,7 +406,7 @@ bool checkLogin(std::string login)
     }
     return true;
 }
-int main()
+int main(int argc, char *argv[])
 {
     // Utwórz gniazdo serwera
     int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
@@ -415,12 +415,19 @@ int main()
         std::cerr << "Błąd przy tworzeniu gniazda serwera\n";
         return -1;
     }
+   if (argc != 2) {
+        std::cerr << "Usage: " << argv[0] << " <port_number>" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    int portNumber = atoi(argv[1]);
 
     // Skonfiguruj strukturę adresową serwera
     sockaddr_in serverAddress;
     serverAddress.sin_family = AF_INET;
-    serverAddress.sin_port = htons(12135); // Możesz zmienić port
+serverAddress.sin_port = htons(portNumber);
     serverAddress.sin_addr.s_addr = INADDR_ANY;
+
 
     // Zwiąż gniazdo z adresem
     if (bind(serverSocket, (struct sockaddr *)&serverAddress, sizeof(serverAddress)) == -1)
@@ -457,9 +464,7 @@ int main()
         close(epollFd);
         return -1;
     }
-
-    std::cout << "Serwer nasłuchuje na porcie 12345...\n";
-
+std::cout << "Serwer uruchomiony\n";
     while (true)
     {
         int nfds = epoll_wait(epollFd, &epollEvent, 1, -1);
