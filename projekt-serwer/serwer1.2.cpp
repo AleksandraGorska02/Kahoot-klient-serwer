@@ -224,8 +224,7 @@ public:
                 if (client.clientAnswer[0] == secondLine[0])
                 {
                     std::cout << "Odpowiedź klienta jest poprawna!\n";
-                    // pokaz czas klienta
-
+                  
                     std::string poprawna = "Odpowiedź klienta jest poprawna!\n";
                     send(client.clientSocket, poprawna.c_str(), poprawna.size(), 0);
                 }
@@ -233,8 +232,7 @@ public:
                 {
                     std::cout << "Odpowiedź klienta jest niepoprawna.\n";
                     // pokaz czas klienta
-                    std::cout << "Czas klienta: " << client.clientTime << std::endl;
-
+                   
                     std::string niepoprawna = "Odpowiedź klienta jest niepoprawna.\n";
                     send(client.clientSocket, niepoprawna.c_str(), niepoprawna.size(), 0);
                 }
@@ -245,7 +243,7 @@ public:
                 const_cast<Client &>(client).clientTime = 0;
             }
         }
-        std::cout << "Koniec rundy\n";
+      //  std::cout << "Koniec rundy\n";
         std::this_thread::sleep_for(std::chrono::seconds(5));
         startGame();
     };
@@ -406,7 +404,7 @@ bool checkLogin(std::string login)
     }
     return true;
 }
-int main()
+int main(int argc, char *argv[])
 {
     // Utwórz gniazdo serwera
     int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
@@ -415,12 +413,19 @@ int main()
         std::cerr << "Błąd przy tworzeniu gniazda serwera\n";
         return -1;
     }
+   if (argc != 2) {
+        std::cerr << "Usage: " << argv[0] << " <port_number>" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    int portNumber = atoi(argv[1]);
 
     // Skonfiguruj strukturę adresową serwera
     sockaddr_in serverAddress;
     serverAddress.sin_family = AF_INET;
-    serverAddress.sin_port = htons(12135); // Możesz zmienić port
+serverAddress.sin_port = htons(portNumber);
     serverAddress.sin_addr.s_addr = INADDR_ANY;
+
 
     // Zwiąż gniazdo z adresem
     if (bind(serverSocket, (struct sockaddr *)&serverAddress, sizeof(serverAddress)) == -1)
@@ -457,9 +462,7 @@ int main()
         close(epollFd);
         return -1;
     }
-
-    std::cout << "Serwer nasłuchuje na porcie 12345...\n";
-
+std::cout << "Serwer uruchomiony\n";
     while (true)
     {
         int nfds = epoll_wait(epollFd, &epollEvent, 1, -1);
@@ -687,7 +690,7 @@ int main()
                         // dodaj klienta do gry
                         games[gameCode].connectedClients.insert(std::pair<int, Client>(clientSocket, connectedClients[clientSocket]));
                         // pokaz kod gry
-                        std::cout << "kod gry: " << games[gameCode].gameCode << std::endl;
+                       // std::cout << "kod gry: " << games[gameCode].gameCode << std::endl;
                         // wyslij klientowi informacje o tym ze jest w grze
 
                         std::cout << "wyslano ok do klienta" << std::endl;
@@ -720,7 +723,7 @@ int main()
                 // wymaz znak nowej lini i ostatnia litere pytrania
                 question.erase(question.size() - 2, 2);
 
-                std::cout << "pytanie: " << question << " odpowiedz: " << answer << std::endl;
+            //    std::cout << "pytanie: " << question << " odpowiedz: " << answer << std::endl;
                 // sprawdz czy klient ma przypisany kod gry jezeli nie to przypisz mu
                 int gameCode;
 
@@ -752,6 +755,9 @@ int main()
                     // dodaj gre do mapy gier
                     games.insert(std::pair<int, Game>(gameCode, game));
                     games[gameCode].connectedClients[clientSocket].gameCode = gameCode;
+                }
+                else{
+                    gameCode=connectedClients[clientSocket].gameCode;
                 }
 
                 std::string gameCodeString = std::to_string(gameCode);
@@ -808,7 +814,7 @@ int main()
 
                 std::cout << "rozpoczeto gre " << std::to_string(games[connectedClients[clientSocket].gameCode].gameCode) << std::endl;
             }
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
     }
 

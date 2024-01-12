@@ -39,11 +39,11 @@ Do zbudowania oraz uruchomienia serwera potrzebne jest wykonanie kilku komend. N
 
 - Skompiluj projekt:
 
-  `cmake --build`
+  `cmake --build .`
 
 - **Uruchom serwer:**
 
-  `./serwer`
+  `./serwer <numer portu>`
 
 ## Użycie
 ### Tworzenie nowego quizu
@@ -119,7 +119,7 @@ To build and run the server, you need to execute a series of commands. First, op
 
 - **Run the server:**
 
-  `./serwer`
+  `./serwer <port number>`
 
 
 ## Usage
