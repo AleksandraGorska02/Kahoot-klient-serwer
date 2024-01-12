@@ -48,28 +48,28 @@ Do zbudowania oraz uruchomienia serwera potrzebne jest wykonanie kilku komend. N
 ## Użycie
 ### Tworzenie nowego quizu
 Użytkownik uruchamiając grę może wybrac jedną z dwóch opcji, które pokażą mu się na ekranie. 
-![Example screenshot](./img/welcome_page.png)
+![Example screenshot](./img/kahoot_1st_page.png)
 
 Jeśli użytkownik wybierze opcję *Stwórz grę*, otworzy mu się formularz, w którym może wpisać swoje pytania z odpowiedziami oraz zaznaczyć, która odpowiedź jest poprawna. Następnie powinien kliknąć przycisk *wyślij grę*.
-![Example screenshot](./img/question_form.png)
+![Example screenshot](./img/kahoot_form.png)
 
 Po stworzeniu gry użytkownikowi wyświetli się Kod gry, który został przydzielony do jego quizzu oraz liczba graczy, która dołączyła do gry. Osoba odpowiedzialna za stworzenie gry może uruchomić quizz klikając przycisk *Start*.
-![Example screenshot](./img/waiting_for_players.png)
+![Example screenshot](./img/kahoot_form_waiting.png)
 
 ### Dołączanie do quizu
 Drugą opcją, któa jest dostępna dla użytkownika po uruchomieniu aplikacji jest dołączenie do już istniejącego quizzu. Po wybraniu opcji *Dołącz do gry*, gracz musi wpisać dowolnie wybrany login (jeśli dany login już istnieje gracz zostanie o tym poinformowany i będzie musiał wpisać inny).
 
-![Example screenshot](./img/login.png)
+![Example screenshot](./img/kahoot_login.png)
 
 Następnym krokiem jest wpisanie kodu gry do jakiej użytkownik chce dołączyć. 
 
-![Example screenshot](./img/game_code.png)
+![Example screenshot](./img/kahoot_game_code.png)
 
 Po podaniu właściwego kodu gracz może potwierdzić gotowość do gry i po rozpoczęciu quizzu przez gamemastera otrzyma pytanie wraz z możliwością zaznaczenia wybranej odpowiedzi.
 
-![Example screenshot](./img/ready.png)
+![Example screenshot](./img/kahoot_ready.png)
 
-![Example screenshot](./img/q1.png)
+![Example screenshot](./img/kahoot_q1.png)
 
 
 Do gry można dołączyć w czasie trwania quizzu jednak wtedy za wszystkie pytania, na które inni użytkownicy już odpowiedzieli otrzyma się 0 punktów i wynik będzie liczony od pierwszego otrzymanego pytania po dołączniu.
@@ -125,28 +125,28 @@ To build and run the server, you need to execute a series of commands. First, op
 ## Usage
 ### Creating new quizz
 When a user starts the game, they can choose one of two options displayed on the screen.
-![Example screenshot](./img/welcome_page.png)
+![Example screenshot](./img/kahoot_1st_page.png)
 
 If the user selects the *Stwórz grę* option, a form will open where they can enter their questions with answers and mark the correct one. Then, they should click the *wyślij grę* button.
-![Example screenshot](./img/question_form.png)
+![Example screenshot](./img/kahoot_form.png)
 
 After creating the game, the user will see the game code assigned to their quiz and the number of players who have joined. The person responsible for creating the game can start the quiz by clicking the *Start* button.
-![Example screenshot](./img/waiting_for_players.png)
+![Example screenshot](./img/kahoot_form_waiting.png)
 
 ### Joining quizz
 The second option available to users after launching the application is to join an existing quiz. After choosing the *Dołącz do gry* option, the player must enter any chosen login (if the login already exists, the player will be informed and must enter a different one).
 
-![Example screenshot](./img/login.png)
+![Example screenshot](./img/kahoot_login.png)
 
 The next step is to enter the game code to which the user wants to join.
 
-![Example screenshot](./img/game_code.png)
+![Example screenshot](./img/kahoot_game_code.png)
 
 After providing the correct code, the player can confirm readiness to play and, when the quiz starts by the game master, receive a question with the option to select the chosen answer.
 
-![Example screenshot](./img/ready.png)
+![Example screenshot](./img/kahoot_ready.png)
 
-![Example screenshot](./img/q1.png)
+![Example screenshot](./img/kahoot_q1.png)
 
 
 Players can join the game during the quiz; however, for all questions that others have already answered, they will receive 0 points, and the score will be calculated from the first question received after joining.
