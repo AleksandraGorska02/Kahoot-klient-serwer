@@ -257,6 +257,11 @@ public class Main {
     static void code(Socket clientSocket, PrintWriter out, GameFrame gameFrame){
         gameFrame.sendCode.addActionListener(e -> {
             String code = gameFrame.sendCodeTextField.getText();
+            //kod gry nie moze byc dłózszy niz 4 znaki
+            if(code.length()>4){
+                gameFrame.sendCodeLabel.setText("Kod gry nie może być dłuższy niż 4 znaki");
+                return;
+            }
             code="X"+code;
             out.println(code);
             System.out.println("Wysłano odpowiedź do serwera: " + code);
