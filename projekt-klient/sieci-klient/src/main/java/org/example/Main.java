@@ -53,17 +53,17 @@ public class Main {
 
         while(true){
         try {
-            //tworzymy okno
-            gameFrame.setVisible(true);
-            gameFrame.makeFirstPanel();
-            gameFrame.setContentPane(gameFrame.firstPanel);
-            gameFrame.validate();
+
 
 //łączymy się z serwerem
             clientSocket.connect(new InetSocketAddress(serverAddress.getAddress(), serverAddress.getPort()));
             System.out.println("Połączono z serwerem 1");
             threadsMessage(clientSocket,gameFrame);
             PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+            gameFrame.setVisible(true);
+            gameFrame.makeFirstPanel();
+            gameFrame.setContentPane(gameFrame.firstPanel);
+            gameFrame.validate();
 //dodajemy akcje dla przycisków
             question(clientSocket, out, gameFrame);
             ok(gameFrame, out);
@@ -110,7 +110,8 @@ public class Main {
             gameFrame.setContentPane(gameFrame.questionPanel);
             gameFrame.validate();
             System.out.println("Otrzymano dane od serwera: przechwycenie wiadomosci " + message);
-            gameFrame.questionLabel.setBounds(100,10,300, 70);
+
+            //ustaw przyciski
 
             gameFrame.a.setBounds(100,100,100, 40);
             gameFrame.b.setBounds(300,100,100, 40);
@@ -119,7 +120,7 @@ public class Main {
 
 
         }
-        if(message.startsWith("Kod")){
+        if(message.startsWith("K")){
             gameFrame.setVisible(true);
             gameFrame.makeGameMasterPanel();
 
@@ -194,47 +195,6 @@ public class Main {
             gameFrame.setContentPane(gameFrame.createGamePanel);
 
 
-
-            gameFrame.createGameLabel.setBounds(100,30,100, 20);
-            gameFrame.createQuestion1Label.setBounds(100,60,100, 20);
-            gameFrame.createQuestion1.setBounds(100,90,300, 30);
-            gameFrame.createQuestion2Label.setBounds(100,150,100, 30);
-            gameFrame.createQuestion2.setBounds(100,180,300, 30);
-            gameFrame.createQuestion3Label.setBounds(100,2400,100, 30);
-            gameFrame.createQuestion3.setBounds(100,270,300, 30);
-            gameFrame.createQuestion4Label.setBounds(100,330,100, 30);
-            gameFrame.createQuestion4.setBounds(100,360,300, 30);
-            gameFrame.createQuestion5Label.setBounds(100,420,100, 30);
-            gameFrame.createQuestion5.setBounds(100,450,300, 30);
-            gameFrame.createAnswer1a.setBounds(100,120,100, 30);
-            gameFrame.createAnswer1b.setBounds(200,120,100, 30);
-            gameFrame.createAnswer1c.setBounds(300,120,100, 30);
-            gameFrame.createAnswer1d.setBounds(400,120,100, 30);
-
-
-            gameFrame.createAnswer2a.setBounds(100,210,100, 30);
-            gameFrame.createAnswer2b.setBounds(200,210,100, 30);
-            gameFrame.createAnswer2c.setBounds(300,210,100, 30);
-            gameFrame.createAnswer2d.setBounds(400,210,100, 30);
-
-
-            gameFrame.createAnswer3a.setBounds(100,300,100, 30);
-            gameFrame.createAnswer3b.setBounds(200,300,100, 30);
-            gameFrame.createAnswer3c.setBounds(300,300,100, 30);
-            gameFrame.createAnswer3d.setBounds(400,300,100, 30);
-
-
-            gameFrame.createAnswer4a.setBounds(100,390,100, 30);
-            gameFrame.createAnswer4b.setBounds(200,390,100, 30);
-            gameFrame.createAnswer4c.setBounds(300,390,100, 30);
-            gameFrame.createAnswer4d.setBounds(400,390,100, 30);
-
-
-            gameFrame.createAnswer5a.setBounds(100,480,100, 30);
-            gameFrame.createAnswer5b.setBounds(200,480,100, 30);
-            gameFrame.createAnswer5c.setBounds(300,480,100, 30);
-            gameFrame.createAnswer5d.setBounds(400,480,100, 30);
-            gameFrame.sendGame.setBounds(100,520,100, 30);
             gameFrame.validate();
         }
 
@@ -278,6 +238,11 @@ public class Main {
             //pole loginu nie może być puste
             if(gameFrame.login.getText().isEmpty()){
                 gameFrame.connectionLabel.setText("wpisz login");
+                return;
+            }
+            //login nie może być dłuższy niż 10 znaków
+            if(gameFrame.login.getText().length()>20){
+                gameFrame.connectionLabel.setText("login nie może być dłuższy niż 20 znaków");
                 return;
             }
             String login = "L"+gameFrame.login.getText();
@@ -363,10 +328,11 @@ public class Main {
                 gameFrame.createGameLabel.setText("Wypelnij wszystkie pola");
                 return;
             }
-            //wtynij wsztkie znaki nowej lini
-
-
-
+            //wiadomosc nie moze byc dłuższa niz 100 znakow
+            if(question1.length()>100||question2.length()>100||question3.length()>100||question4.length()>100||question5.length()>100){
+                gameFrame.createGameLabel.setText("Pytanie nie może być dłuższe niż 100 znaków");
+                return;
+            }
             String QandA1= "P1"+question1+answer1+"\n";
 
             String QandA2= "P2"+question2+answer2+"\n";
