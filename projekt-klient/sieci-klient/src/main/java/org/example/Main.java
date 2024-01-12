@@ -347,6 +347,7 @@ public class Main {
             out.println(QandA4);
             out.println(QandA5);
             System.out.println("Wysłano odpowiedź do serwera: " + QandA1);
+            gameFrame.sendGame.setEnabled(false);
 
         });
         }
