@@ -115,7 +115,7 @@ To build and run the server, you need to execute a series of commands. First, op
 
 - Compile the project:
 
-  `cmake --build`
+  `cmake --build .`
 
 - **Run the server:**
 
