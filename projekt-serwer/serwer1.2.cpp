@@ -756,6 +756,9 @@ std::cout << "Serwer uruchomiony\n";
                     games.insert(std::pair<int, Game>(gameCode, game));
                     games[gameCode].connectedClients[clientSocket].gameCode = gameCode;
                 }
+                else{
+                    gameCode=connectedClients[clientSocket].gameCode;
+                }
 
                 std::string gameCodeString = std::to_string(gameCode);
                 std::string filename = std::to_string(gameCode) + ".txt";
@@ -811,7 +814,7 @@ std::cout << "Serwer uruchomiony\n";
 
                 std::cout << "rozpoczeto gre " << std::to_string(games[connectedClients[clientSocket].gameCode].gameCode) << std::endl;
             }
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
     }
 
